@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /prontuarios/{escola} {
+      function logado() { return request.auth != null && request.auth.token.email != null; }
+      // E-mail confirmado: garante que quem entrou é mesmo o dono da caixa de entrada.
+      function confirmado() { return logado() && request.auth.token.email_verified == true; }
+      function email() { return request.auth.token.email.lower(); }
+      // Conta principal: o código SHA-256 do e-mail em minúsculas (o mesmo "donoHash" do config.js).
+      // Assim o e-mail não aparece no site público.
+      function dono() {
+        return confirmado() && hashing.sha256(email()).toHexString().lower() == "12210f0f24737383c8825280578675ecbde60920e62d07c19f1abdb29b293304";
+      }
+      function meuAcesso() { return /databases/$(database)/documents/prontuarios/$(escola)/acessos/$(email()); }
+      function acesso() { return confirmado() && exists(meuAcesso()); }
+      function papel() { return get(meuAcesso()).data.papel; }
+      function liberado() { return dono() || acesso(); }
+      function editor() { return dono() || (acesso() && papel() == "editor"); }
+      function colaborador() { return editor() || (acesso() && papel() == "colaborador"); }
+      function aba(c) { return c in ["lotes", "l_antigo", "l_grupao", "l_cog", "l_avulsas"]; }
+      function loteOk() {
+        return request.resource.data.keys().hasOnly(["a"]) && request.resource.data.a is list
+          && request.resource.data.a.size() <= 2000;
+      }
+
+      // Acessos: cada um lê o próprio; o editor vê e muda todos.
+      match /acessos/{e} {
+        allow read: if editor() || (logado() && email() == e);
+        allow write: if editor() && request.resource.data.get("papel", "") in ["consulta", "colaborador", "editor"];
+        allow delete: if editor();
+      }
+      // Data da última cópia: "backup" (baixada no app) e "copia-auto" (script da cópia diária, login de Consulta).
+      match /meta/{d} {
+        allow read: if liberado();
+        allow write: if request.resource.data.keys().hasOnly(["quando"]) && request.resource.data.quando is int
+          && ((d == "backup" && colaborador()) || (d == "copia-auto" && liberado()));
+      }
+
+      // Onde ficam as pastas (faixas de números por aba).
+      match /config/{d} { allow read: if liberado(); allow write: if editor(); }
+
+      // Histórico: quem pode alterar registra o que fez; ninguém muda nem apaga depois.
+      match /historico/{h} {
+        allow read: if editor();
+        allow create: if colaborador() && request.resource.data.por == email()
+          && request.resource.data.quando == request.time
+          && request.resource.data.keys().hasOnly(["acao", "aba", "texto", "por", "quando"])
+          && request.resource.data.acao is string && request.resource.data.acao.size() <= 60
+          && request.resource.data.aba is string && request.resource.data.aba.size() <= 20
+          && request.resource.data.texto is string && request.resource.data.texto.size() <= 1000;
+      }
+
+      // Lixeira: só o editor exclui, então só ele põe, vê e restaura.
+      // Apagar de vez: o editor só depois de 30 dias; antes disso, só a conta principal.
+      match /lixeira/{d} {
+        allow read: if editor();
+        allow create: if editor() && request.resource.data.por == email() && request.resource.data.quando == request.time;
+        // Restaurar só marca o item como restaurado (ele continua guardado).
+        allow update: if editor() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["restaurado", "restauradoPor"])
+          && request.resource.data.restauradoPor == email();
+        allow delete: if dono() || (editor() && resource.data.quando < request.time - duration.value(30, "d"));
+      }
+
+      // Pastas fora do arquivo: todos veem; quem pode alterar registra a retirada e a devolução.
+      match /retiradas/{d} {
+        allow read: if liberado();
+        allow create, update: if colaborador() && request.resource.data.por == email();
+        allow delete: if colaborador();
+      }
+
+      // Versão destas regras: o app avisa a secretaria quando o Firebase está com regras antigas.
+      match /versao/{v} { allow read: if liberado() && v == "regras-5"; }
+
+      // Cadastros, guardados em lotes. O colaborador inclui e edita, mas não consegue apagar linhas.
+      // O editor apaga no máximo 50 por vez; apagar mais que isso ou um lote inteiro, só a conta principal.
+      // Assim ninguém além dela consegue esvaziar o arquivo, nem tentando por fora do app.
+      match /{colecao}/{lote} {
+        allow read: if liberado() && aba(colecao);
+        allow create: if colaborador() && aba(colecao) && loteOk();
+        allow update: if colaborador() && aba(colecao) && loteOk()
+          && (request.resource.data.a.size() >= resource.data.a.size()
+            || (editor() && request.resource.data.a.size() >= resource.data.a.size() - 50)
+            || dono());
+        allow delete: if dono() && aba(colecao);
+      }
+    }
+  }
+}

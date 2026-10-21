@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arquivo de Prontuários</title>
+<meta name="description" content="Localização dos prontuários do arquivo da secretaria pelo número da remissiva.">
+<meta name="theme-color" content="#27323e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Prontuários">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<script src="config.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f2ee;--card:#fff;--ink:#1f2933;--mut:#6b7280;--line:#e6e3dd;--navy:#27323e;--or:#e9a45a;--chip:#eef1f4;--chipink:#27323e;--btn:#27323e;--btnink:#fff;--warn:#fff3d6;--warnink:#7a5200;--bad:#b3261e;
+box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#13171c;--card:#1d232a;--ink:#e8eaec;--mut:#98a2ab;--line:#2f373f;--navy:#0e1216;--chip:#2a333c;--chipink:#e9a45a;--btn:#e9a45a;--btnink:#1a1206;--warn:#3a2f10;--warnink:#f1c75b;--bad:#f2867f}}
+:root[data-theme="dark"]{--bg:#13171c;--card:#1d232a;--ink:#e8eaec;--mut:#98a2ab;--line:#2f373f;--navy:#0e1216;--chip:#2a333c;--chipink:#e9a45a;--btn:#e9a45a;--btnink:#1a1206;--warn:#3a2f10;--warnink:#f1c75b;--bad:#f2867f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--navy);color:#fff;padding:calc(18px + env(safe-area-inset-top,0px)) 16px 18px}
+.hd{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:14px}
+.logo{width:56px;height:56px;border-radius:16px;object-fit:cover;flex:none}
+.hd>div{flex:1}
+.kick{color:var(--or);font-size:.72rem;font-weight:700;letter-spacing:.14em}
+h1{font-size:1.5rem;margin:0;font-weight:800;line-height:1.15}
+h1 span{color:var(--or)}
+.sub{opacity:.8;font-size:.95rem}
+#role{background:rgba(255,255,255,.14);border-radius:999px;padding:8px 16px;font-weight:700;font-size:.9rem;white-space:nowrap}
+.hd>.who{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.who button{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:999px;padding:5px 14px;font-size:.85rem}
+main{max-width:760px;margin:0 auto;padding:16px}
+.tabs{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px;margin-bottom:16px;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs button{flex:1 0 auto;white-space:nowrap;border:0;background:transparent;border-radius:999px;padding:11px 14px;font-weight:600;color:var(--mut)}
+.tabs button.on{background:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+#mtabs button{font-size:.8rem;letter-spacing:.03em}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:16px}
+h2{font-size:1.3rem;margin:0 0 14px;font-weight:800}
+label{display:block;font-size:.95rem;color:var(--mut);font-weight:500;margin:0 0 6px}
+input,textarea,select{width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 16px;font-size:1rem}
+input::placeholder,textarea::placeholder{color:var(--mut);opacity:.7}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--or);outline-offset:1px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.full{grid-column:1/-1}
+.big{display:block;width:100%;background:var(--btn);color:var(--btnink);border:0;border-radius:14px;padding:18px;font-weight:700;font-size:1.05rem;margin-top:16px;text-align:center;text-decoration:none}
+.ghost{background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.92rem;color:var(--mut)}
+.link{background:none;border:0;padding:6px 0;color:var(--mut);text-decoration:underline;font-size:.95rem}
+.row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.num{background:var(--chip);color:var(--chipink);font-weight:800;font-size:1.15rem;min-width:86px;text-align:center;border-radius:12px;padding:10px 6px;font-variant-numeric:tabular-nums}
+.info{flex:1;min-width:0}
+.nm{font-weight:700;font-size:1.08rem}
+.rs{color:var(--mut);font-size:.9rem}
+.act{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.act button{background:transparent;border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:.92rem;color:var(--mut)}
+.act .del{color:var(--bad)}
+.act select{width:auto;padding:8px 12px;border-radius:999px;font-size:.92rem}
+#q{font-size:1.15rem;padding:18px}
+.cnt{color:var(--mut);font-size:.9rem;margin:10px 4px 6px}
+.msg{padding:12px 14px;border-radius:14px;margin:8px 0 12px;background:var(--warn);color:var(--warnink)}
+.err{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+.alert{color:var(--bad)}
+.hide{display:none!important}
+.lv{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.lv:last-child{border-bottom:0}
+.lv b{min-width:112px}
+#c-resumo .lv{justify-content:space-between;align-items:center}
+ol{padding-left:20px;margin:0}ol li{margin-bottom:8px}
+.pill{display:inline-block;background:var(--chip);color:var(--chipink);border-radius:999px;padding:6px 16px;font-weight:800}
+.badge{display:inline-block;background:var(--chip);color:var(--chipink);border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:700}
+.badge.ok{background:transparent;border:1px solid var(--line);color:var(--mut)}
+.auth{max-width:440px;margin:24px auto}
+.auth input{margin-bottom:14px}
+.mt{margin-top:14px}
+.grp{border:1px solid var(--line);border-radius:14px;padding:4px 14px;margin:10px 0}
+.grp .row{padding:10px 0}
+details.card summary{cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px}
+details.card summary::-webkit-details-marker{display:none}
+details.card summary h2{margin:0}
+details.card[open] summary{margin-bottom:12px}
+details>summary.ghost{display:inline-block;cursor:pointer;list-style:none}
+details>summary.ghost::-webkit-details-marker{display:none}
+.uform{border-top:1px solid var(--line);margin-top:12px;padding-top:12px}
+.file input{padding:10px}
+.ver{text-align:center;color:var(--mut);font-size:.8rem;margin:8px 0 24px}
+.hist{padding:8px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.hist:last-child{border-bottom:0}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#print{display:none}
+@media print{
+  @page{size:A4;margin:12mm 10mm}
+  body{background:#fff;color:#000;font-size:10.5pt}
+  body>header,main{display:none!important}
+  #print{display:block}
+  .p-cab{display:flex;align-items:center;gap:12px;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:8px}
+  .p-cab img{width:48px;height:48px;border-radius:10px}
+  .p-cab h1{font-size:15pt;color:#000}.p-cab h1 span{color:#000}
+  .p-cab .rs,.p-nota{color:#333;font-size:9.5pt}
+  #print h2{font-size:12pt;margin:12px 0 4px;break-after:avoid}
+  #print table{width:100%;border-collapse:collapse}
+  #print th,#print td{border:1px solid #888;padding:3px 6px;text-align:left;vertical-align:top}
+  #print th{background:#eee}
+  #print tr{break-inside:avoid}
+  #print td.n{white-space:nowrap;font-weight:700;width:1%}
+  #print td.ok{width:28px}
+  #print tbody.g{border-top:2px solid #000}
+  .p-ass{margin-top:18px;display:flex;gap:30px}
+  .p-ass div{flex:1;border-top:1px solid #000;padding-top:3px;font-size:9.5pt}
+}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.hd{flex-wrap:wrap}.hd>.who{flex-direction:row;width:100%;justify-content:space-between;align-items:center}h1{font-size:1.3rem}
+  .row{flex-wrap:wrap}.info{flex:1 1 140px}.act{margin-left:auto}#stabs button{padding:11px 10px}}
+</style>
+</head>
+<body>
+<header><div class="hd"><img class="logo" alt="COG" src="data:image/jpeg;base64,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"><div><div class="kick">SECRETARIA · ARQUIVO</div><h1><span>Prontuários</span> Remissivas</h1><div class="sub">Localização por número de remissiva</div></div>
+  <div class="who"><div id="role">…</div><button id="sair" class="hide">Sair</button></div></div></header>
+<main>
+<div id="status" class="msg">Carregando…</div>
+<div id="aviso"></div><div id="lembrete"></div>
+
+<section id="v-login" class="hide"><form class="card auth" id="f-login">
+  <h2>Entrar</h2>
+  <p class="rs">Entre com o e-mail e a senha que a secretaria cadastrou para você. Em cada aparelho, você só precisa entrar uma vez.</p>
+  <label for="l-email">E-mail</label><input id="l-email" type="email" inputmode="email" autocomplete="username">
+  <label for="l-senha">Senha</label><input id="l-senha" type="password" autocomplete="current-password">
+  <div id="l-msg"></div><button class="big">Entrar</button>
+  <button type="button" class="link mt" id="esqueci">Esqueci a senha</button>
+  <p class="rs hide" id="l-primeiro">É a secretaria e ainda não tem senha? <button type="button" class="link" id="ir-primeiro">Primeiro acesso</button></p>
+</form></section>
+
+<section id="v-primeiro" class="hide"><form class="card auth" id="f-primeiro">
+  <h2>Primeiro acesso da secretaria</h2>
+  <p class="rs">Digite o e-mail da conta principal e crie a senha. Depois vamos mandar um link de confirmação para esse e-mail.</p>
+  <label for="p-email">E-mail</label><input id="p-email" type="email" inputmode="email" autocomplete="off">
+  <label for="p-senha">Nova senha (mínimo 6 caracteres)</label><input id="p-senha" type="password" autocomplete="new-password">
+  <label for="p-senha2">Repita a senha</label><input id="p-senha2" type="password" autocomplete="new-password">
+  <div id="p-msg"></div><button class="big">Criar acesso</button>
+  <button type="button" class="link mt" data-voltar>Voltar</button>
+</form></section>
+
+<section id="v-verificar" class="hide"><div class="card auth">
+  <h2>Confirme seu e-mail</h2>
+  <p class="rs">Para proteger os dados dos alunos, cada pessoa confirma o próprio e-mail uma vez. Abra a caixa de entrada de <b id="vf-email"></b> (olhe também o spam), toque no link de confirmação e depois volte aqui. Se o link não chegou, toque em “Mandar o link de novo”.</p>
+  <div id="vf-msg"></div>
+  <button class="big" id="ja-confirmei">Já confirmei</button>
+  <button class="ghost mt" id="reenviar">Mandar o link de novo</button>
+  <button type="button" class="link mt" id="vf-sair">Sair</button>
+</div></section>
+
+<section id="v-semacesso" class="hide"><div class="card auth">
+  <h2>Sem acesso ainda</h2>
+  <p class="rs">O login <b id="sa-email"></b> existe, mas ainda não tem acesso ao arquivo. Peça à secretaria para liberar em <b>ACESSO → Dar acesso</b>. Assim que ela liberar, o app abre sozinho aqui.</p>
+</div></section>
+
+<section id="v-app" class="hide">
+  <div class="tabs" id="mtabs"></div>
+
+  <section id="acervo">
+    <div class="tabs" id="stabs">
+      <button data-s="busca" class="on">Pesquisar</button>
+      <button data-s="form" data-papel="colaborador">Cadastrar</button>
+      <button data-s="conf" data-papel="colaborador">Conferência</button>
+      <button data-s="plan" data-papel="colaborador">Planilha</button>
+    </div>
+
+    <section id="s-busca"><div class="card">
+      <label for="q" id="q-label">Buscar</label><input id="q" type="search" autocomplete="off">
+      <div class="btns"><button class="ghost" id="pr-nome">Imprimir lista (A–Z)</button><button class="ghost" id="pr-num">Imprimir por número</button></div>
+      <div id="cnt" class="cnt"></div><div id="list"></div></div></section>
+
+    <section id="s-form" class="hide"><form class="card" id="f-reg">
+      <h2 id="f-titulo">Cadastrar</h2>
+      <div class="grid">
+        <div class="full"><label for="nome">Nome completo</label><input id="nome" placeholder="Ex.: Ricardo Alves de Souza" autocomplete="off"></div>
+        <div><label for="num" id="num-label">Nº</label><input id="num" inputmode="numeric" autocomplete="off"></div>
+        <div id="resp-box"><label for="resp">Responsável (se houver homônimo)</label><input id="resp" autocomplete="off"></div>
+        <div id="nasc-box"><label for="nasc">Ano de nascimento</label><input id="nasc" inputmode="numeric" maxlength="4" placeholder="Ex.: 2008" autocomplete="off"></div>
+        <div class="full"><label for="obs">Observação (série, ano, período, “não localizado”…)</label><input id="obs" autocomplete="off"></div>
+      </div>
+      <div id="fmsg"></div>
+      <button class="big">Salvar</button>
+      <button type="button" class="ghost hide mt" id="cancel">Cancelar edição</button>
+    </form></section>
+
+    <section id="s-conf" class="hide">
+      <div class="card"><h2>Conferência dos dados</h2>
+        <p class="rs">Mostra o que precisa ser conferido nas pastas: cadastros repetidos, números usados por mais de um nome, nomes que aparecem com números diferentes e nomes sem número. Confira na pasta física antes de corrigir. Depois de salvar em <b>editar</b>, você volta para esta lista.</p>
+        <div id="c-msg"></div><div id="c-resumo"></div>
+        <div class="btns"><button class="ghost" id="pr-conf">Imprimir para conferir no arquivo</button></div></div>
+      <div id="c-grupos"></div>
+    </section>
+
+    <section id="s-plan" class="hide">
+      <div class="card"><h2>Importar planilha</h2>
+        <p class="rs" id="imp-ajuda"></p>
+        <label class="file" for="arq">Escolher arquivo CSV<input id="arq" type="file" accept=".csv,.txt,.tsv,text/csv,text/plain"></label>
+        <label for="paste" class="mt">…ou cole as linhas copiadas do Excel</label>
+        <textarea id="paste" rows="6"></textarea>
+        <button class="big" id="doImp">Importar</button><div id="imsg"></div></div>
+      <div class="card"><h2>Exportar</h2>
+        <p class="rs">Baixa a lista completa desta aba em CSV, que abre no Excel. A planilha baixada pode ser importada de volta sem ajustes.</p>
+        <button class="big" id="exp">Baixar planilha (CSV)</button></div>
+    </section>
+  </section>
+
+  <section id="acesso" class="hide">
+    <div class="card"><h2>Seu acesso</h2><span class="pill" id="myrole">…</span><p id="mydesc" class="rs"></p>
+      <div id="conta" class="hide"><button class="ghost" id="mudar-senha">Mudar minha senha</button><div id="ms-msg"></div></div>
+      <button class="ghost mt hide" id="instalar">Instalar o app neste aparelho</button></div>
+    <div class="card"><h2>Quem pode o quê</h2>
+      <div class="lv"><b>Consulta</b><span>Só pesquisar prontuários.</span></div>
+      <div class="lv"><b>Colaborador</b><span>Pesquisar, cadastrar, editar, conferir, e importar planilhas.</span></div>
+      <div class="lv"><b>Editor</b><span>Tudo isso, excluir cadastros, usar a lixeira, ver o histórico, definir onde ficam as pastas e gerenciar o acesso.</span></div></div>
+
+    <div class="card hide" id="acessos-fb"><h2>Acessos ao app</h2>
+      <p class="rs" id="dono-info"></p>
+      <div id="u-list"></div>
+      <details class="mt"><summary class="ghost">+ Dar acesso</summary>
+        <form id="f-user" class="uform"><div class="grid">
+          <div class="full"><label for="u-nome">Nome</label><input id="u-nome" autocomplete="off" placeholder="Ex.: Maria"></div>
+          <div class="full"><label for="u-email">E-mail</label><input id="u-email" type="email" inputmode="email" autocomplete="off"></div>
+          <div><label for="u-senha">Senha inicial</label><input id="u-senha" autocomplete="off"></div>
+          <div><label for="u-papel">Nível de acesso</label><select id="u-papel"><option value="consulta">Consulta</option><option value="colaborador" selected>Colaborador</option><option value="editor">Editor</option></select></div></div>
+          <p class="rs">Passe o e-mail e a senha para a pessoa. Chega um link de confirmação no e-mail dela: sem confirmar, ela não vê os dados. Depois ela pode trocar a senha em ACESSO → Mudar minha senha.</p>
+          <div id="u-msg"></div><button class="big">Dar acesso</button></form></details></div>
+
+    <div class="card hide" id="locais-card"><h2>Onde ficam as pastas</h2>
+      <p class="rs">Uma faixa de números por linha. A pesquisa mostra onde ir buscar cada pasta.</p>
+      <label for="loc-aba">Aba</label><select id="loc-aba"></select>
+      <label for="loc-txt" class="mt">Faixas</label><textarea id="loc-txt" rows="5" placeholder="1-2000 Armário A, gaveta 1&#10;2001-4000 Armário A, gaveta 2"></textarea>
+      <div id="loc-msg"></div><button class="big" id="loc-salvar">Salvar locais</button></div>
+
+    <details class="card hide" id="lixeira-card"><summary><h2>Lixeira</h2><span class="badge" id="lix-n">0</span></summary>
+      <p class="rs">Tudo o que foi excluído fica aqui. <b>Restaurar</b> põe de volta na aba de onde saiu.</p><div id="lix-msg"></div><div id="lix-list"></div></details>
+
+    <details class="card hide" id="hist-card"><summary><h2>Histórico de alterações</h2><span class="rs">últimas 500</span></summary>
+      <p class="rs">Quem cadastrou, editou, excluiu, importou e mexeu nos acessos. Ninguém consegue apagar este histórico.</p>
+      <input id="hist-q" type="search" placeholder="Filtrar por nome, número ou pessoa…" autocomplete="off"><div id="hist-list" class="mt"></div></details>
+
+
+    <div class="card"><h2>Cópia de segurança</h2>
+      <p class="rs" id="bk">Nenhuma cópia baixada ainda.</p><p class="rs" id="bk-auto"></p>
+      <p class="rs">Baixa todas as abas numa planilha só. Baixe de tempos em tempos e salve na pasta do Drive da escola.</p>
+      <button class="big" id="exp-tudo">Baixar cópia completa (CSV)</button>
+      <div id="restaurar" class="hide"><label class="file mt" for="rest-arq">Restaurar a partir de uma cópia completa<input id="rest-arq" type="file" accept=".csv,text/csv"></label>
+        <p class="rs">Traz de volta o que estiver na cópia e ainda não estiver no app. Não apaga nem muda o que já existe.</p><div id="rest-msg"></div></div></div>
+    <p class="ver" id="versao"></p>
+  </section>
+</section>
+</main>
+<div id="print"></div>
+<script>
+(function () {
+"use strict";
+const $ = (i) => document.getElementById(i);
+// Versão do app e das regras do Firebase (firestore.rules, bloco "versao"). Troque juntas quando as regras mudarem.
+const VERSAO = "7", REGRAS = "regras-5";
+const CONF = window.PRONTUARIOS_FIREBASE || {};
+const PAPEL = {consulta: "Consulta", colaborador: "Colaborador", editor: "Editor", dono: "Secretaria"};
+const NIVEL = {consulta: 0, colaborador: 1, editor: 2, dono: 2};
+const DESC = {
+  consulta: "Pode apenas pesquisar prontuários.",
+  colaborador: "Pode pesquisar, cadastrar, editar, conferir e importar planilhas.",
+  editor: "Pode tudo: pesquisar, cadastrar, editar, excluir, remover cópias repetidas e gerenciar o acesso.",
+  dono: "Conta principal da secretaria: pode tudo e libera o acesso dos funcionários."
+};
+
+function norm(s) { return String(s == null ? "" : s).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim(); }
+function limpa(s) { return String(s == null ? "" : s).replace(/\s+/g, " ").trim(); }
+// "1.234" -> "1234", "007" -> "7"; números com letras ficam como estão.
+function numero(s) { s = String(s == null ? "" : s).trim().replace(/[.\s]/g, ""); return /^\d+$/.test(s) ? String(parseInt(s, 10)) : s; }
+// Ano de nascimento: aceita "2008" ou uma data como "15/03/2008".
+function ano(s) { const m = String(s == null ? "" : s).match(/\b(19|20)\d{2}\b/); return m ? m[0] : ""; }
+function fmt(n) { return !n ? "s/ nº" : /^\d+$/.test(n) ? n.replace(/\B(?=(\d{3})+(?!\d))/g, ".") : n; }
+function esc(s) { const d = document.createElement("div"); d.textContent = s == null ? "" : s; return d.innerHTML; }
+function say(el, t, bad) { el.innerHTML = t ? '<div class="msg' + (bad ? " err" : "") + '">' + esc(t) + "</div>" : ""; }
+function sobrenome(n) { const p = String(n).trim().split(/\s+/); return p[p.length - 1] || ""; }
+const pad = (n, w) => String(n).padStart(w, "0");
+
+/* Cada aba guarda os cadastros em "lotes" (documentos com até 1.300/1.500 linhas): abrir o app lê
+   poucos documentos, e o Firebase fica dentro do plano gratuito mesmo com milhares de prontuários. */
+const ACERVOS = [
+  {id: "alunos", titulo: "ALUNOS", num: "Remissiva", rotulo: "Nº da remissiva", responsavel: true, col: "lotes", max: 1300, lote: (n) => "l" + pad(n, 2),
+    linha: (r) => [r.numero, r.nome, r.responsavel, r.obs, r.nasc || ""],
+    reg: (a) => ({numero: numero(a[0]), nome: limpa(a[1]), responsavel: limpa(a[2]), obs: limpa(a[3]), nasc: ano(a[4])})}
+].concat([["antigo", "ANTIGO GRUPO ESCOLAR", "Nº do prontuário"], ["grupao", "PROFESSORES GRUPÃO", "Nº do prontuário"],
+  ["cog", "PROFESSORES COG", "Nº do prontuário"], ["avulsas", "PASTAS AVULSAS", "Nº da pasta", true]].map(([id, titulo, rotulo, semNumeroOk]) => ({
+  id, titulo, num: "Prontuário", rotulo, responsavel: false, semNumeroOk: !!semNumeroOk, col: "l_" + id, max: 1500, lote: (n) => "c" + pad(n, 3),
+  linha: (r) => [r.numero, r.nome, r.obs],
+  reg: (a) => ({numero: numero(a[0]), nome: limpa(a[1]), responsavel: "", obs: limpa(a[2]), nasc: ""})})));
+const AC = {}; ACERVOS.forEach((a) => { AC[a.id] = a; });
+// A secretaria já marca os homônimos na observação ("I · HOMÔNIMO", "II · HOMÔNIMA"): esses estão conferidos.
+const homonimo = (r) => /homonim/.test(norm(r.obs));
+
+const E = {modo: "local", db: null, fb: null, user: null, papel: "editor", ac: "alunos", sub: "busca", lotes: {}, regs: {}, ok: {},
+  ed: null, volta: null, acessos: [], unsub: [], instalar: null, conf: {}, locais: {}, copiaAuto: 0};
+ACERVOS.forEach((a) => { E.lotes[a.id] = {}; E.regs[a.id] = []; });
+E.sync = {};
+// Antes de gravar, a lista precisa estar conferida com o servidor; senão a checagem de repetidos olharia dados velhos.
+const ESPERA = "Ainda carregando a lista atualizada. Confira a internet e tente de novo em alguns segundos.";
+const pronto = (ids) => ids.every((id) => E.sync[id]);
+function pode(p) { return NIVEL[E.papel] >= NIVEL[p]; }
+function acervo() { return AC[E.ac]; }
+
+/* ---------- Banco de dados: Firebase (site da escola) ou só no aparelho (modo de teste) ---------- */
+async function firebaseDB(conf) {
+  const base = "https://www.gstatic.com/firebasejs/10.12.2/";
+  const [appM, fs, au] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-firestore.js"), import(base + "firebase-auth.js")]);
+  const app = appM.initializeApp(conf);
+  let db;
+  try { db = fs.initializeFirestore(app, {localCache: fs.persistentLocalCache({tabManager: fs.persistentMultipleTabManager()})}); }
+  catch (e) { db = fs.getFirestore(app); }
+  const auth = au.getAuth(app);
+  // Segunda instância só para criar logins de outras pessoas sem desconectar quem está usando.
+  const auth2 = au.initializeAuth(appM.initializeApp(conf, "cadastro"), {persistence: au.inMemoryPersistence});
+  if (conf.emulador) { // só para testes no computador do desenvolvedor
+    fs.connectFirestoreEmulator(db, "127.0.0.1", 8085);
+    [auth, auth2].forEach((x) => au.connectAuthEmulator(x, "http://127.0.0.1:9099", {disableWarnings: true}));
+  }
+  const P = (p) => "prontuarios/" + (conf.escola || "principal") + "/" + p;
+  // O Firestore não aceita lista dentro de lista: lá cada linha vira {n, nome, resp, obs}.
+  const campos = (c) => c === "lotes" ? ["n", "nome", "resp", "obs", "nasc"] : ["n", "nome", "obs"];
+  const deMapa = (c, m) => campos(c).map((k) => m && m[k] != null ? m[k] : "");
+  const paraMapa = (c, x) => { const o = {}; campos(c).forEach((k, i) => { o[k] = x[i] == null ? "" : x[i]; }); return o; };
+  const linhas = (c, d) => d && Array.isArray(d.a) ? Object.assign({}, d, {a: d.a.map((m) => deMapa(c, m))}) : d;
+  return {
+    // "cache" avisa quando a lista veio só da cópia do aparelho (ainda sem conferir no servidor).
+    ouvir: (c, cb, err) => fs.onSnapshot(fs.collection(db, P(c)), {includeMetadataChanges: true},
+      (s) => cb(s.docs.map((d) => ({id: d.id, data: linhas(c, d.data())})), s.metadata.fromCache), err),
+    ouvirDoc: (p, cb, err) => fs.onSnapshot(fs.doc(db, P(p)), (d) => cb(d.exists() ? d.data() : null), err),
+    ler: async (p) => { const d = await fs.getDoc(fs.doc(db, P(p))); return d.exists() ? d.data() : null; },
+    gravar: (p, v) => fs.setDoc(fs.doc(db, P(p)), v),
+    atualizar: (p, v) => fs.updateDoc(fs.doc(db, P(p)), v),
+    apagar: (p) => fs.deleteDoc(fs.doc(db, P(p))),
+    agora: () => fs.serverTimestamp(),
+    adicionar: (c, v) => fs.addDoc(fs.collection(db, P(c)), v),
+    ultimos: async (c, n) => (await fs.getDocs(fs.query(fs.collection(db, P(c)), fs.orderBy("quando", "desc"), fs.limit(n))))
+      .docs.map((d) => Object.assign({id: d.id}, d.data())),
+    // Lê o lote mais recente do servidor, aplica a mudança e grava: duas pessoas mexendo ao mesmo tempo não se atropelam.
+    mutar: (c, id, fn) => fs.runTransaction(db, async (tx) => {
+      const r = fs.doc(db, P(c + "/" + id)), d = await tx.get(r);
+      tx.set(r, {a: fn(d.exists() ? linhas(c, d.data()).a || [] : []).map((x) => paraMapa(c, x))});
+    }),
+    onAuth: (fn) => au.onAuthStateChanged(auth, fn),
+    login: (email, senha) => au.signInWithEmailAndPassword(auth, email, senha),
+    reset: (email) => au.sendPasswordResetEmail(auth, email),
+    // Ao sair, apaga do aparelho a cópia dos cadastros: num computador compartilhado ninguém vê depois.
+    sair: async () => {
+      await au.signOut(auth);
+      try { await fs.terminate(db); await fs.clearIndexedDbPersistence(db); } catch (e) { /* outra aba aberta */ }
+      location.reload();
+    },
+    criarConta: async (email, senha) => {
+      try {
+        const c = await au.createUserWithEmailAndPassword(auth2, email, senha);
+        await au.sendEmailVerification(c.user).catch(() => {});
+        await au.signOut(auth2); return true;
+      } catch (e) {
+        if (!e || e.code !== "auth/email-already-in-use") throw e;
+        // Login já existia (pode ter sido criado por outra pessoa): só quem lê o e-mail consegue definir a senha.
+        await au.sendPasswordResetEmail(auth, email).catch(() => {});
+        return false;
+      }
+    },
+    criarDono: async (email, senha) => { const c = await au.createUserWithEmailAndPassword(auth, email, senha); await au.sendEmailVerification(c.user); },
+    reenviar: () => au.sendEmailVerification(auth.currentUser),
+    recarregar: async () => { await auth.currentUser.reload(); await auth.currentUser.getIdToken(true); return auth.currentUser; }
+  };
+}
+function localDB() {
+  const K = "prontuarios:teste";
+  let d = {}; try { d = JSON.parse(localStorage.getItem(K) || "{}"); } catch (e) { d = {}; }
+  const subs = new Set(), copia = (v) => JSON.parse(JSON.stringify(v));
+  const salva = () => { try { localStorage.setItem(K, JSON.stringify(d)); } catch (e) { /* sem espaço */ } setTimeout(() => subs.forEach((f) => f())); };
+  const docs = (c) => Object.keys(d).filter((p) => p.startsWith(c + "/")).map((p) => ({id: p.slice(c.length + 1), data: copia(d[p])}));
+  return {
+    ouvir: (c, cb) => { const f = () => cb(docs(c)); subs.add(f); setTimeout(f); return () => subs.delete(f); },
+    ouvirDoc: (p, cb) => { const f = () => cb(d[p] ? copia(d[p]) : null); subs.add(f); setTimeout(f); return () => subs.delete(f); },
+    ler: async (p) => d[p] ? copia(d[p]) : null,
+    gravar: async (p, v) => { d[p] = copia(v); salva(); },
+    atualizar: async (p, v) => { d[p] = Object.assign(d[p] || {}, copia(v)); salva(); },
+    agora: () => Date.now(),
+    adicionar: async (c, v) => { const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8); d[c + "/" + id] = copia(v); salva(); return {id}; },
+    ultimos: async (c, n) => docs(c).map((x) => Object.assign({id: x.id}, x.data)).sort((x, y) => y.quando - x.quando).slice(0, n),
+    apagar: async (p) => { delete d[p]; salva(); },
+    mutar: async (c, id, fn) => { const p = c + "/" + id; d[p] = {a: fn(((d[p] || {}).a || []).slice())}; salva(); }
+  };
+}
+
+/* ---------- Leitura dos lotes ---------- */
+function ordena(a, regs) {
+  const k = a.responsavel ? (r) => norm(sobrenome(r.nome)) + " " + norm(r.nome) + " " + norm(r.responsavel) : (r) => norm(r.nome);
+  return regs.map((r) => [k(r), r]).sort((x, y) => x[0].localeCompare(y[0], "pt-BR") || (parseInt(x[1].numero, 10) || 0) - (parseInt(y[1].numero, 10) || 0)).map((x) => x[1]);
+}
+function monta(a) {
+  const regs = [];
+  Object.keys(E.lotes[a.id]).sort().forEach((l) => E.lotes[a.id][l].forEach((linha, i) => {
+    if (!Array.isArray(linha)) return;
+    const r = Object.assign(a.reg(linha), {id: l + ":" + i, lote: l, bruto: JSON.stringify(linha)});
+    r.h = norm(r.nome + " " + r.responsavel + " " + r.obs + " " + r.numero + " " + fmt(r.numero) + " " + r.nasc);
+    regs.push(r);
+  }));
+  E.regs[a.id] = ordena(a, regs);
+}
+function ouvirTudo() {
+  pararTudo();
+  say($("aviso"), "");
+  ACERVOS.forEach((a) => E.unsub.push(E.db.ouvir(a.col, (docs, cache) => {
+    E.lotes[a.id] = {}; docs.forEach((d) => { E.lotes[a.id][d.id] = (d.data && d.data.a) || []; });
+    monta(a); E.ok[a.id] = true; E.sync[a.id] = !cache;
+    if (a.id === E.ac) { render(); if (E.sub === "conf") renderConf(); }
+  }, (e) => { console.warn(e); say($("aviso"), "Não deu para carregar os dados. Confira a internet e o seu acesso.", 1); })));
+  E.db.ler("meta/backup").then((d) => { E.copiaEm = d && d.quando || 0; if (E.copiaEm) marcaCopia(E.copiaEm); lembrete(); }).catch(() => {});
+  E.db.ler("meta/copia-auto").then((d) => { E.copiaAuto = d && d.quando || 0; lembrete(); }).catch(() => {});
+  E.unsub.push(E.db.ouvirDoc("config/locais", (d) => { E.locais = d || {}; if (E.ok[E.ac]) render(); }, (e) => console.warn(e)));
+}
+function pararTudo() { E.unsub.forEach((f) => { try { f(); } catch (e) { /* já parou */ } }); E.unsub = []; }
+
+/* ---------- Gravação ---------- */
+const MUDOU = "Este cadastro foi alterado ou excluído por outra pessoa agora há pouco. A lista já foi atualizada: confira e tente de novo.";
+function posicao(arr, bruto) { const i = arr.findIndex((x) => JSON.stringify(x) === bruto); if (i < 0) throw new Error(MUDOU); return i; }
+function falha(e) {
+  const c = e && e.code || "";
+  if (c === "permission-denied" || c === "permission_denied") return "Seu acesso não permite esta ação.";
+  if (c === "unavailable") return "Sem internet agora. Tente de novo quando a conexão voltar.";
+  return (e && e.message && !/firebase|firestore/i.test(e.message)) ? e.message : "Não foi possível salvar. Confira a internet e tente de novo.";
+}
+async function inserir(a, regs) {
+  // Preenche os lotes que ainda têm espaço e cria lotes novos quando precisa.
+  const lotes = E.lotes[a.id], ids = Object.keys(lotes).sort(), grupos = {};
+  let i = 0;
+  for (const id of ids) { const livre = a.max - lotes[id].length; if (livre > 0 && i < regs.length) { grupos[id] = regs.slice(i, i + livre); i += livre; } }
+  let n = ids.length;
+  while (i < regs.length) { let id; do { id = a.lote(++n); } while (lotes[id]); grupos[id] = regs.slice(i, i + a.max); i += a.max; }
+  for (const id of Object.keys(grupos)) await E.db.mutar(a.col, id, (arr) => arr.concat(grupos[id].map(a.linha)));
+}
+async function alterar(a, r, novo) { await E.db.mutar(a.col, r.lote, (arr) => { arr[posicao(arr, r.bruto)] = a.linha(novo); return arr; }); }
+// Excluir guarda o cadastro na lixeira antes; se a exclusão falhar, a cópia da lixeira sai da lista
+// (fica marcada, porque a lixeira só pode ser apagada depois de 30 dias).
+async function excluir(a, r) {
+  const lx = await E.db.adicionar("lixeira", {aba: a.id, regs: [campoReg(r)], motivo: "excluído", por: quem(), quando: E.db.agora()});
+  try { await E.db.mutar(a.col, r.lote, (arr) => { arr.splice(posicao(arr, r.bruto), 1); return arr; }); }
+  catch (e) { if (lx && lx.id) E.db.atualizar("lixeira/" + lx.id, {restaurado: true, restauradoPor: quem()}).catch(() => {}); throw e; }
+  registra("excluiu", a.id, desc(r) + " (foi para a lixeira)");
+}
+function chaveIgual(a, r) { return norm(r.nome) + "|" + r.numero + "|" + norm(r.responsavel) + "|" + norm(r.obs); }
+async function removerIdenticos(a) {
+  let vistos = new Set(), total = 0, tirados = [];
+  for (const id of Object.keys(E.lotes[a.id]).sort()) {
+    let depois, tirou = [];
+    await E.db.mutar(a.col, id, (arr) => {
+      const s = new Set(vistos), sai = [], fica = arr.filter((x) => { const k = chaveIgual(a, a.reg(x)); if (s.has(k)) { sai.push(campoReg(a.reg(x))); return false; } s.add(k); return true; });
+      depois = s; tirou = sai; return fica;
+    });
+    vistos = depois; total += tirou.length; tirados = tirados.concat(tirou);
+  }
+  if (tirados.length) {
+    await E.db.adicionar("lixeira", {aba: a.id, regs: tirados, motivo: "cópias idênticas", por: quem(), quando: E.db.agora()}).catch((e) => console.warn(e));
+    registra("removeu cópias idênticas", a.id, tirados.length + " cadastro(s) (foram para a lixeira)");
+  }
+  return total;
+}
+
+/* ---------- Histórico e lixeira ---------- */
+const ms = (t) => t && t.toMillis ? t.toMillis() : (t || 0);
+const quem = () => E.modo === "firebase" ? meuEmail() : "teste";
+function desc(r) { return fmt(r.numero) + " — " + r.nome + (r.responsavel ? " (resp. " + r.responsavel + ")" : "") + (r.nasc ? " (nasc. " + r.nasc + ")" : ""); }
+// Registra no histórico; se falhar (sem internet), a alteração já foi feita e não é desfeita.
+function registra(acao, aba, texto) {
+  return E.db.adicionar("historico", {acao, aba: aba || "", texto: String(texto || "").slice(0, 900), por: quem(), quando: E.db.agora()}).catch((e) => console.warn(e));
+}
+const campoReg = (r) => ({numero: r.numero || "", nome: r.nome || "", responsavel: r.responsavel || "", obs: r.obs || "", nasc: r.nasc || ""});
+function mudancas(antes, depois) {
+  const m = [];
+  if (antes.numero !== depois.numero) m.push("nº " + fmt(antes.numero) + " → " + fmt(depois.numero));
+  if (antes.nome !== depois.nome) m.push("nome “" + antes.nome + "” → “" + depois.nome + "”");
+  if (antes.responsavel !== depois.responsavel) m.push("responsável “" + antes.responsavel + "” → “" + depois.responsavel + "”");
+  if ((antes.nasc || "") !== (depois.nasc || "")) m.push("nascimento “" + (antes.nasc || "") + "” → “" + (depois.nasc || "") + "”");
+  if (antes.obs !== depois.obs) m.push("observação “" + antes.obs + "” → “" + depois.obs + "”");
+  return m.join("; ") || "sem mudança";
+}
+
+/* ---------- Telas de acesso ---------- */
+function view(v) {
+  ["login", "primeiro", "verificar", "semacesso", "app"].forEach((k) => $("v-" + k).classList.toggle("hide", k !== v));
+  $("status").classList.add("hide");
+  $("sair").classList.toggle("hide", E.modo !== "firebase" || !E.user);
+  if (v !== "app") $("role").textContent = E.modo === "firebase" ? "Entrar" : "…";
+}
+// O e-mail da conta principal não fica no site: o config.js guarda só o código SHA-256 dele.
+const sha256 = async (s) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, "0")).join("");
+const ehDono = async (email) => !!(CONF.donoHash && email && await sha256(String(email).trim().toLowerCase()) === CONF.donoHash);
+const souDono = () => ehDono(E.user && E.user.email);
+const meuEmail = () => String(E.user && E.user.email || "").toLowerCase();
+
+$("f-login").onsubmit = async (ev) => {
+  ev.preventDefault();
+  const email = $("l-email").value.trim().toLowerCase();
+  try { localStorage.setItem("prontuarios:email", email); } catch (e) { /* ok */ }
+  try { await E.fb.login(email, $("l-senha").value); $("l-senha").value = ""; say($("l-msg"), ""); }
+  catch (e) {
+    const c = e && e.code || "";
+    say($("l-msg"), c === "auth/too-many-requests" ? "Muitas tentativas. Espere alguns minutos ou use “Esqueci a senha”."
+      : c === "auth/network-request-failed" ? "Sem internet. Confira a conexão." : "E-mail ou senha incorretos.", 1);
+  }
+};
+$("esqueci").onclick = async () => {
+  const email = $("l-email").value.trim();
+  if (!email) return say($("l-msg"), "Digite o seu e-mail acima e toque de novo em “Esqueci a senha”.", 1);
+  try { await E.fb.reset(email); say($("l-msg"), "Se esse e-mail tiver login, chega nele um link para criar uma senha nova. Olhe também o spam."); }
+  catch (e) { say($("l-msg"), "Não deu para enviar agora. Confira o e-mail digitado.", 1); }
+};
+$("ir-primeiro").onclick = () => { $("p-email").value = ""; view("primeiro"); $("p-email").focus(); };
+document.querySelectorAll("[data-voltar]").forEach((b) => { b.onclick = () => view("login"); });
+$("f-primeiro").onsubmit = async (ev) => {
+  ev.preventDefault();
+  if ($("p-senha").value.length < 6) return say($("p-msg"), "A senha precisa ter pelo menos 6 caracteres.", 1);
+  if ($("p-senha").value !== $("p-senha2").value) return say($("p-msg"), "As senhas não conferem.", 1);
+  const email = $("p-email").value.trim().toLowerCase();
+  if (!(await ehDono(email))) return say($("p-msg"), "Esse não é o e-mail da conta principal. O Primeiro acesso é só para ela; os funcionários recebem o acesso da secretaria.", 1);
+  try { await E.fb.criarDono(email, $("p-senha").value); }
+  catch (e) { say($("p-msg"), e && e.code === "auth/email-already-in-use" ? "Essa conta já existe. Volte e entre com a senha, ou use “Esqueci a senha”." : "Não deu para criar a conta. Confira a internet.", 1); }
+};
+$("ja-confirmei").onclick = async () => {
+  const u = await E.fb.recarregar().catch(() => null);
+  if (u && u.emailVerified) { E.user = u; entrou(); } else say($("vf-msg"), "Ainda não aparece como confirmado. Toque no link do e-mail e tente de novo.", 1);
+};
+$("reenviar").onclick = async () => { try { await E.fb.reenviar(); say($("vf-msg"), "Link enviado de novo."); } catch (e) { say($("vf-msg"), "Espere alguns minutos antes de pedir outro link.", 1); } };
+$("sair").onclick = () => { sairDados(); E.fb.sair(); };
+$("vf-sair").onclick = () => { sairDados(); E.fb.sair(); };
+$("mudar-senha").onclick = async () => {
+  try { await E.fb.reset(meuEmail()); say($("ms-msg"), "Mandamos um link para criar a nova senha no seu e-mail."); }
+  catch (e) { say($("ms-msg"), "Não deu para enviar agora.", 1); }
+};
+
+// Depois do login no Firebase: descobre o nível de acesso (e fica ouvindo, para liberar na hora).
+async function entrou() {
+  sairDados();
+  // Todo mundo confirma o e-mail antes de ver os dados: é isso que as regras do Firebase exigem.
+  if (!E.user.emailVerified) { $("vf-email").textContent = E.user.email; return view("verificar"); }
+  const u = E.user, dono = await souDono();
+  if (E.user !== u) return; // trocou de usuário enquanto conferia
+  if (dono) { E.papel = "dono"; abreApp(); conferirRegras(); return; }
+  let aberto = false;
+  E.unsubMeu = E.fb.ouvirDoc("acessos/" + meuEmail(), (d) => {
+    if (!d) { aberto = false; pararTudo(); $("sa-email").textContent = E.user.email; return view("semacesso"); }
+    E.papel = NIVEL[d.papel] != null && d.papel !== "dono" ? d.papel : "consulta"; E.acessoNome = d.nome || "";
+    if (!aberto) { aberto = true; abreApp(); } else montaApp();
+  }, () => { $("sa-email").textContent = E.user.email; view("semacesso"); });
+}
+// Para de ouvir tudo, inclusive o próprio acesso (troca de usuário ou saída).
+function sairDados() { pararTudo(); if (E.unsubMeu) { E.unsubMeu(); E.unsubMeu = null; } }
+async function conferirRegras() {
+  try { await E.fb.ler("versao/" + REGRAS); }
+  catch (e) { say($("aviso"), "As regras de segurança do Firebase estão desatualizadas. Cole o conteúdo novo do arquivo firestore.rules no Firebase (Firestore → Regras → Publicar).", 1); }
+}
+
+/* ---------- Navegação ---------- */
+function abreApp() { ouvirTudo(); montaApp(); }
+function montaApp() {
+  view("app");
+  $("mtabs").innerHTML = ACERVOS.map((a) => '<button data-m="' + a.id + '">' + esc(a.titulo) + "</button>").join("") + '<button data-m="acesso">ACESSO</button>';
+  [].forEach.call($("stabs").children, (b) => b.classList.toggle("hide", !!b.dataset.papel && !pode(b.dataset.papel)));
+  const nome = E.modo === "firebase" ? (E.papel === "dono" ? "Secretaria" : ((E.acessoNome || meuEmail()).split(/[ @]/)[0])) : "";
+  $("role").textContent = E.papel === "dono" ? "Secretaria" : (nome ? nome + " · " : "") + PAPEL[E.papel];
+  $("myrole").textContent = PAPEL[E.papel];
+  $("mydesc").textContent = (E.modo === "firebase" ? "Conectado como " + meuEmail() + ". " : "") + DESC[E.papel] +
+    (E.modo === "local" ? " (Modo de teste: os dados ficam só neste aparelho.)" : "");
+  $("conta").classList.toggle("hide", E.modo !== "firebase");
+  $("acessos-fb").classList.toggle("hide", E.modo !== "firebase" || !pode("editor"));
+  $("restaurar").classList.toggle("hide", !pode("editor"));
+  ["locais-card", "lixeira-card", "hist-card"].forEach((id) => $(id).classList.toggle("hide", !pode("editor")));
+  $("loc-aba").innerHTML = ACERVOS.map((a) => '<option value="' + a.id + '">' + esc(a.titulo) + "</option>").join("");
+  lembrete();
+  $("versao").textContent = "Versão " + VERSAO + (E.modo === "firebase" ? "" : " · modo de teste");
+  if (E.modo === "local") say($("aviso"), "Modo de teste: os dados ficam só neste aparelho. Para usar com login e com os dados juntos em todos os computadores, preencha o config.js (veja o LEIA-ME).");
+  abre($("acesso").classList.contains("hide") ? E.ac : "acesso");
+}
+$("mtabs").onclick = (e) => { const b = e.target.closest("button"); if (b) abre(b.dataset.m); };
+$("stabs").onclick = (e) => { const b = e.target.closest("button"); if (b) { if (b.dataset.s !== "form") limpaForm(); sub(b.dataset.s); } };
+
+function abre(m) {
+  [].forEach.call($("mtabs").children, (x) => {
+    x.classList.toggle("on", x.dataset.m === m);
+    if (x.dataset.m === m && x.scrollIntoView) x.scrollIntoView({block: "nearest", inline: "center"});
+  });
+  $("acervo").classList.toggle("hide", m === "acesso");
+  $("acesso").classList.toggle("hide", m !== "acesso");
+  if (m === "acesso") {
+    if (E.modo === "firebase" && pode("editor")) ouvirAcessos();
+    if (pode("editor")) { ouvirLixeira(); $("loc-txt").value = E.locais[$("loc-aba").value] || ""; }
+    return;
+  }
+  // Ao trocar de aba, a planilha escolhida na aba anterior sai da caixa: não dá para importar numa aba o arquivo de outra.
+  if (E.ac !== m) { E.ac = m; limpaForm(); $("q").value = ""; $("paste").value = ""; $("arq").value = ""; say($("imsg"), ""); say($("c-msg"), ""); }
+  const a = acervo();
+  $("num-label").textContent = a.rotulo + (a.responsavel ? "" : " (opcional)");
+  $("resp-box").classList.toggle("hide", !a.responsavel);
+  $("nasc-box").classList.toggle("hide", !a.responsavel);
+  $("q").placeholder = a.responsavel ? "Nome, sobrenome, responsável ou número…" : "Nome, sobrenome, observação ou número…";
+  $("q-label").textContent = "Buscar em " + a.titulo.toLowerCase();
+  $("imp-ajuda").textContent = "Colunas na ordem: Nome, " + a.rotulo + (a.responsavel ? ", Responsável" : "") + " e Observação. Só o nome é obrigatório. " +
+    "Linhas repetidas (mesmo nome e número) são ignoradas. Linha sem número entra sem número: o sistema não inventa número. " +
+    "Número que já é de outro nome entra também, e os dois aparecem na Conferência.";
+  $("paste").placeholder = a.responsavel ? "Maria da Silva\t101\nJoão Souza\t102\tAna Souza" : "Maria da Silva\t12\t1950 a 1962";
+  sub(E.sub);
+  render();
+}
+function sub(s) {
+  if (!pode("colaborador")) s = "busca";
+  E.sub = s;
+  [].forEach.call($("stabs").children, (b) => b.classList.toggle("on", b.dataset.s === s));
+  ["busca", "form", "conf", "plan"].forEach((k) => $("s-" + k).classList.toggle("hide", k !== s));
+  if (s === "busca") $("q").focus();
+  if (s === "form" && !E.ed) { $("num").value = acervo().responsavel ? proximo() : ""; $("nome").focus(); }
+  if (s === "conf") renderConf();
+}
+
+/* ---------- Pesquisa ---------- */
+function proximo() {
+  let m = 0;
+  E.regs[E.ac].forEach((r) => { if (/^\d+$/.test(r.numero)) m = Math.max(m, parseInt(r.numero, 10)); });
+  return m + 1;
+}
+function linha(r, extras) {
+  const a = acervo(), loc = localDe(a, r);
+  return '<div class="row"><div class="num">' + esc(fmt(r.numero)) + '</div><div class="info"><div class="nm">' + esc(r.nome) + "</div>" +
+    (r.responsavel ? '<div class="rs">Responsável: ' + esc(r.responsavel) + "</div>" : "") +
+    (r.nasc ? '<div class="rs">Nascimento: ' + esc(r.nasc) + "</div>" : "") +
+    (r.obs ? '<div class="rs">' + esc(r.obs) + "</div>" : "") +
+    (loc ? '<div class="rs">Local: ' + esc(loc) + "</div>" : "") +
+    (extras || "") +
+    '</div><div class="act">' + (pode("colaborador") ? '<button data-e="' + esc(r.id) + '">editar</button>' : "") +
+    (pode("editor") ? '<button class="del" data-d="' + esc(r.id) + '">excluir</button>' : "") + "</div></div>";
+}
+function render() {
+  if (!E.ok[E.ac]) { $("cnt").textContent = "Carregando…"; $("list").innerHTML = ""; return; }
+  const a = acervo(), regs = E.regs[E.ac];
+  const q = norm($("q").value), porNome = {}, porNum = {};
+  regs.forEach((r) => { const k = norm(r.nome); porNome[k] = (porNome[k] || 0) + 1; if (r.numero) porNum[r.numero] = (porNum[r.numero] || 0) + 1; });
+  const res = filtra(regs, q);
+  $("cnt").textContent = q ? res.length + " resultado(s) de " + regs.length + (res.length > 200 ? " — mostrando os 200 primeiros, refine a busca" : "")
+    : regs.length + " cadastrado(s)" + (regs.length > 400 ? " — digite para pesquisar" : "");
+  const mostrar = !q && regs.length > 400 ? [] : res.slice(0, 200);
+  $("list").innerHTML = mostrar.map((r) => {
+    const hom = porNome[norm(r.nome)] > 1 && !homonimo(r) && !r.nasc, dup = r.numero && porNum[r.numero] > 1;
+    return linha(r, (hom ? '<div class="rs">' + (a.responsavel && !r.responsavel ? '<span class="alert">Nome repetido: se for homônimo, marque HOMÔNIMO na observação ou informe o responsável</span>' : "(nome repetido — confira o número)") + "</div>" : "") +
+      (dup ? '<div class="rs alert">Atenção: este número aparece em mais de um cadastro</div>' : "") +
+      (!r.numero && !a.semNumeroOk ? '<div class="rs alert">Sem número</div>' : ""));
+  }).join("") || '<div class="msg">' + (q ? "Nenhum cadastro encontrado." : regs.length ? "Digite o nome, sobrenome ou número na caixa acima." : "Nenhum cadastro ainda." + (pode("colaborador") ? " Use a aba Planilha para importar." : "")) + "</div>";
+}
+$("q").oninput = render;
+function filtra(regs, q) {
+  const t = q ? q.split(" ") : [];
+  return regs.filter((r) => t.every((x) => r.h.includes(x)));
+}
+
+function acha(id) { return (E.sub === "conf" && E.conf[id]) || E.regs[E.ac].find((r) => r.id === id); }
+async function cliqueLista(e) {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.e) {
+    const r = acha(b.dataset.e); if (!r) return;
+    E.ed = r; E.volta = E.sub;
+    $("nome").value = r.nome; $("num").value = r.numero; $("resp").value = r.responsavel; $("obs").value = r.obs; $("nasc").value = r.nasc || "";
+    $("f-titulo").textContent = "Editar cadastro"; $("cancel").classList.remove("hide"); say($("fmsg"), "");
+    sub("form"); return;
+  }
+  if (b.dataset.d) {
+    if (!b.dataset.arm) {
+      b.dataset.arm = "1"; b.textContent = "Confirmar exclusão?";
+      setTimeout(() => { b.dataset.arm = ""; b.textContent = "excluir"; }, 4000); return;
+    }
+    const r = acha(b.dataset.d); if (!r) return;
+    b.disabled = true;
+    try { await excluir(acervo(), r); } catch (err) { alert(falha(err)); b.disabled = false; }
+  }
+}
+$("list").onclick = cliqueLista;
+$("c-grupos").onclick = cliqueLista;
+
+/* ---------- Cadastro ---------- */
+function limpaForm() {
+  E.ed = null; E.volta = null;
+  ["nome", "num", "resp", "obs", "nasc"].forEach((i) => { $(i).value = ""; });
+  $("f-titulo").textContent = "Cadastrar"; $("cancel").classList.add("hide");
+}
+$("cancel").onclick = () => { const v = E.volta; limpaForm(); say($("fmsg"), ""); sub(v || "busca"); };
+function valida(a, novo, atual) {
+  if (!novo.nome) return "Informe o nome completo.";
+  if (novo.nascDigitado && !novo.nasc) return "Ano de nascimento inválido. Use 4 números, por exemplo 2008.";
+  if (novo.nasc && (+novo.nasc < 1900 || +novo.nasc > new Date().getFullYear())) return "Ano de nascimento fora do esperado.";
+  const outros = E.regs[a.id].filter((r) => !atual || r.id !== atual.id);
+  if (novo.numero && !(atual && atual.numero === novo.numero)) {
+    const o = outros.find((r) => r.numero === novo.numero);
+    if (o) return "O nº " + fmt(novo.numero) + " já está em uso por " + o.nome + ". Escolha outro número.";
+  }
+  const mudouNome = !atual || norm(atual.nome) !== norm(novo.nome) || norm(atual.responsavel) !== norm(novo.responsavel);
+  if (mudouNome) {
+    const hom = outros.filter((r) => norm(r.nome) === norm(novo.nome));
+    if (a.responsavel) {
+      if (novo.nasc && hom.some((r) => r.nasc === novo.nasc)) return "Já existe aluno com este nome e este ano de nascimento (remissiva " + hom.filter((r) => r.nasc === novo.nasc).map((r) => fmt(r.numero)).join(", ") + "). Confira se não é a mesma pessoa.";
+      const diferente = novo.nasc && hom.every((r) => r.nasc && r.nasc !== novo.nasc);
+      if (hom.length && !novo.responsavel && !homonimo(novo) && !diferente) return "Já existe aluno com este nome (remissiva " + hom.map((r) => fmt(r.numero)).join(", ") + "). Se for outra pessoa, escreva HOMÔNIMO na observação, informe o responsável ou o ano de nascimento.";
+      if (novo.responsavel && hom.some((r) => norm(r.responsavel) === norm(novo.responsavel))) return "Já existe um aluno com este nome e este responsável.";
+    } else if (hom.some((r) => r.numero === novo.numero)) return "Este nome já está cadastrado com este número.";
+  }
+  return "";
+}
+$("f-reg").onsubmit = async (ev) => {
+  ev.preventDefault();
+  const a = acervo(), novo = {nome: limpa($("nome").value), numero: numero($("num").value), responsavel: a.responsavel ? limpa($("resp").value) : "", obs: limpa($("obs").value),
+    nasc: a.responsavel ? ano($("nasc").value) : "", nascDigitado: a.responsavel && !!$("nasc").value.trim()};
+  if (!pronto([a.id])) return say($("fmsg"), ESPERA, 1);
+  const erro = valida(a, novo, E.ed);
+  if (erro) return say($("fmsg"), erro, 1);
+  const bt = ev.target.querySelector(".big"); bt.disabled = true;
+  try {
+    delete novo.nascDigitado;
+    const antes = E.ed;
+    if (antes) await alterar(a, antes, novo); else await inserir(a, [novo]);
+    if (antes) registra("editou", a.id, desc(antes) + ": " + mudancas(antes, novo)); else registra("cadastrou", a.id, desc(novo));
+    const v = E.volta, msg = "Salvo: " + fmt(novo.numero) + " — " + novo.nome + ".";
+    limpaForm();
+    if (v) { sub(v); say(v === "conf" ? $("c-msg") : $("fmsg"), msg); }
+    else { say($("fmsg"), msg); setTimeout(() => { if (!E.ed && a.responsavel) $("num").value = proximo(); }, 400); $("nome").focus(); }
+  } catch (e) { say($("fmsg"), falha(e), 1); }
+  bt.disabled = false;
+};
+
+/* ---------- Conferência ---------- */
+function conferencia(a) {
+  const regs = E.regs[a.id], iguais = {}, porNum = {}, porNome = {};
+  regs.forEach((r) => {
+    (iguais[norm(r.nome) + "|" + r.numero + "|" + norm(r.responsavel)] = iguais[norm(r.nome) + "|" + r.numero + "|" + norm(r.responsavel)] || []).push(r);
+    if (r.numero) (porNum[r.numero] = porNum[r.numero] || []).push(r);
+    (porNome[norm(r.nome)] = porNome[norm(r.nome)] || []).push(r);
+  });
+  const grupos = (o) => Object.keys(o).map((k) => o[k]);
+  const repetidos = grupos(iguais).filter((g) => g.length > 1);
+  const numConflito = grupos(porNum).filter((g) => new Set(g.map((r) => norm(r.nome))).size > 1)
+    .sort((x, y) => (parseInt(x[0].numero, 10) || 0) - (parseInt(y[0].numero, 10) || 0));
+  const distintos = (vs) => vs.every(Boolean) && new Set(vs).size === vs.length;
+  const homonimosOk = (g) => g.every(homonimo) || (a.responsavel && (distintos(g.map((r) => norm(r.responsavel))) || distintos(g.map((r) => r.nasc))));
+  const nomeVarios = grupos(porNome).filter((g) => new Set(g.map((r) => r.numero).filter(Boolean)).size > 1 && !homonimosOk(g));
+  const identicos = repetidos.reduce((s, g) => s + g.length - new Set(g.map((r) => norm(r.obs))).size, 0);
+  return {repetidos, numConflito, nomeVarios, semNumero: a.semNumeroOk ? [] : regs.filter((r) => !r.numero), identicos};
+}
+function renderConf() {
+  const a = acervo();
+  if (!E.ok[a.id]) { $("c-resumo").innerHTML = '<div class="cnt">Carregando…</div>'; return; }
+  const c = conferencia(a);
+  const secoes = [
+    ["Cadastros repetidos", "Mesmo nome e mesmo número cadastrados mais de uma vez. Se for cópia, exclua as sobras.", c.repetidos],
+    ["Número usado por mais de um nome", "O mesmo número aparece com nomes diferentes. Confira qual nome está na pasta e corrija o outro.", c.numConflito],
+    ["Mesmo nome com números diferentes", a.responsavel ? "Se for outra pessoa (homônimo), escreva HOMÔNIMO na observação dos dois, como já é feito nos outros. Se for a mesma pessoa, fica a pasta certa e o outro cadastro é corrigido ou excluído." : "Pode ser outra pessoa com o mesmo nome. Use a observação para diferenciar.", c.nomeVarios],
+    ["Sem número", "Cadastros sem número de pasta. Localize a pasta e preencha o número.", c.semNumero.map((r) => [r])]
+  ];
+  E.conf = {}; E.secoes = secoes;
+  secoes.forEach((s) => s[2].forEach((g) => g.forEach((r) => { E.conf[r.id] = r; })));
+  $("c-resumo").innerHTML = secoes.map((s) =>
+    '<div class="lv"><b>' + esc(s[0]) + '</b><span class="badge' + (s[2].length ? "" : " ok") + '">' + (s[2].length || "nenhum") + "</span></div>"
+  ).join("") + (pode("editor") && c.identicos ? '<button class="ghost mt" id="rm-ident">Remover ' + c.identicos + " cópia(s) idêntica(s)</button>" +
+    '<p class="rs">Remove só as cópias exatas (nome, número, responsável e observação iguais) e mantém um cadastro de cada.</p>' : "");
+  const abertas = {}; $("c-grupos").querySelectorAll("details").forEach((d) => { abertas[d.dataset.k] = d.open; });
+  let primeira = true;
+  $("c-grupos").innerHTML = secoes.filter((s) => s[2].length).map((s) => {
+    const sozinho = s === secoes[3], lim = sozinho ? 500 : 300, aberta = s[0] in abertas ? abertas[s[0]] : primeira;
+    const corpo = sozinho ? '<div class="grp">' + s[2].slice(0, lim).map((g) => linha(g[0])).join("") + "</div>"
+      : s[2].slice(0, lim).map((g) => '<div class="grp">' + g.map((r) => linha(r)).join("") + "</div>").join("");
+    primeira = false;
+    return '<details class="card" data-k="' + esc(s[0]) + '"' + (aberta ? " open" : "") + "><summary><h2>" + esc(s[0]) + '</h2><span class="badge">' + s[2].length + "</span></summary>" +
+      '<p class="rs">' + esc(s[1]) + "</p>" + corpo +
+      (s[2].length > lim ? '<p class="rs">Mostrando ' + lim + " de " + s[2].length + ". Corrija estes e os demais aparecem.</p>" : "") + "</details>";
+  }).join("") || '<div class="msg">Nenhum problema encontrado nesta aba.</div>';
+  const rm = $("rm-ident");
+  if (rm) rm.onclick = async () => {
+    if (!rm.dataset.arm) { rm.dataset.arm = "1"; rm.textContent = "Confirmar remoção?"; return; }
+    if (!pronto([a.id])) return say($("c-msg"), ESPERA, 1);
+    rm.disabled = true;
+    try { say($("c-msg"), (await removerIdenticos(a)) + " cópia(s) removida(s)."); }
+    catch (e) {
+      say($("c-msg"), /permission/.test(e && e.code || "") ? "Por segurança, só a conta principal da secretaria remove mais de 50 cadastros de uma vez. Entre com ela para remover estas cópias." : falha(e), 1);
+      rm.disabled = false;
+    }
+  };
+}
+
+/* ---------- Planilha ---------- */
+function lePlanilha(texto) {
+  const linhas = texto.replace(/^\uFEFF/, "").split(/\r?\n/).filter((l) => l.trim());
+  if (!linhas.length) return [];
+  const sep = linhas[0].includes("\t") ? "\t" : linhas[0].includes(";") ? ";" : ",";
+  const cel = (l) => { // CSV com aspas: "Souza; Davi" fica numa coluna só
+    const out = []; let cur = "", q = false;
+    for (let i = 0; i < l.length; i++) {
+      const ch = l[i];
+      if (q) { if (ch === '"' && l[i + 1] === '"') { cur += '"'; i++; } else if (ch === '"') q = false; else cur += ch; }
+      else if (ch === '"' && !cur.trim()) q = true; else if (ch === sep) { out.push(cur); cur = ""; } else cur += ch;
+    }
+    out.push(cur); return out.map((c) => c.trim());
+  };
+  return linhas.map((l) => cel(l).map((c) => c.replace(/^'(?=[=+@])/, ""))).filter((c) => c[0] && norm(c[0]) !== "nome");
+}
+$("arq").onchange = async () => {
+  const f = $("arq").files[0]; if (!f) return;
+  const buf = await f.arrayBuffer();
+  let txt;
+  try { txt = new TextDecoder("utf-8", {fatal: true}).decode(buf); }
+  catch (e) { txt = new TextDecoder("windows-1252").decode(buf); } // CSV salvo pelo Excel em português
+  $("paste").value = txt;
+  say($("imsg"), txt.split(/\r?\n/).filter((l) => l.trim()).length + " linha(s) lidas de " + f.name + ". Confira e toque em Importar para gravar em " + acervo().titulo + ".");
+};
+$("doImp").onclick = async () => {
+  const a = acervo(), txt = $("paste").value;
+  if (!txt.trim()) return say($("imsg"), "Escolha um arquivo ou cole as linhas da planilha.", 1);
+  if (!pronto([a.id])) return say($("imsg"), ESPERA, 1);
+  const {novos, repetidos, conflitos, semNum} = prepara(a, lePlanilha(txt));
+  if (!novos.length) return say($("imsg"), "Nada novo para importar" + (repetidos ? ": as " + repetidos + " linha(s) já estão cadastradas." : "."), 1);
+  $("doImp").disabled = true; say($("imsg"), "Importando " + novos.length + " cadastro(s) em " + a.titulo + "…");
+  try {
+    await inserir(a, novos);
+    $("paste").value = ""; $("arq").value = "";
+    registra("importou", a.id, novos.length + " cadastro(s) da planilha" + (repetidos ? ", " + repetidos + " repetido(s) ignorado(s)" : ""));
+    say($("imsg"), novos.length + " cadastro(s) importado(s) em " + a.titulo + (repetidos ? ", " + repetidos + " repetido(s) ignorado(s)" : "") +
+      (conflitos ? ", " + conflitos + " com número que já era de outro nome" : "") + (semNum ? ", " + semNum + " sem número" : "") +
+      "." + (conflitos || semNum ? " Veja a aba Conferência." : ""));
+  } catch (e) { say($("imsg"), falha(e), 1); }
+  $("doImp").disabled = false;
+};
+// Separa o que é novo do que já está cadastrado (mesmo nome e número), contando conflitos e linhas sem número.
+function prepara(a, cels) {
+  const vistos = new Set(E.regs[a.id].map((r) => norm(r.nome) + "|" + r.numero + "|" + norm(r.responsavel)));
+  const usados = {}; E.regs[a.id].forEach((r) => { if (r.numero) (usados[r.numero] = usados[r.numero] || new Set()).add(norm(r.nome)); });
+  const novos = []; let repetidos = 0, conflitos = 0, semNum = 0;
+  cels.forEach((c) => {
+    const r = {nome: limpa(c[0]), numero: numero(c[1]), responsavel: a.responsavel ? limpa(c[2]) : "", obs: limpa(a.responsavel ? c[3] : c[2]), nasc: a.responsavel ? ano(c[4]) : ""};
+    const k = norm(r.nome) + "|" + r.numero + "|" + norm(r.responsavel);
+    if (vistos.has(k)) { repetidos++; return; }
+    vistos.add(k);
+    if (!r.numero) { if (!a.semNumeroOk) semNum++; }
+    else { const s = usados[r.numero] = usados[r.numero] || new Set(); if ([...s].some((n) => n !== norm(r.nome))) conflitos++; s.add(norm(r.nome)); }
+    novos.push(r);
+  });
+  return {novos, repetidos, conflitos, semNum};
+}
+function celula(s) {
+  s = String(s == null ? "" : s);
+  if (/^[=+@\t\r]/.test(s)) s = "'" + s; // não deixa o Excel tratar um nome como fórmula
+  return /[;"\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function csv(a) {
+  const cab = ["Nome", a.num].concat(a.responsavel ? ["Responsável"] : [], ["Observação"], a.responsavel ? ["Nascimento"] : []);
+  return [cab].concat(E.regs[a.id].map((r) => [r.nome, r.numero].concat(a.responsavel ? [r.responsavel] : [], [r.obs], a.responsavel ? [r.nasc] : [])));
+}
+async function baixa(nome, linhas) {
+  const dados = "\uFEFF" + linhas.map((l) => l.map(celula).join(";")).join("\r\n");
+  const el = document.createElement("a");
+  el.href = URL.createObjectURL(new Blob([dados], {type: "text/csv;charset=utf-8"})); el.download = nome;
+  document.body.appendChild(el); el.click(); setTimeout(() => { URL.revokeObjectURL(el.href); el.remove(); }, 1000);
+}
+const hoje = () => { const d = new Date(); return d.getFullYear() + "-" + pad(d.getMonth() + 1, 2) + "-" + pad(d.getDate(), 2); };
+$("exp").onclick = () => { const a = acervo(); baixa("prontuarios-" + a.id + "-" + hoje() + ".csv", csv(a)).catch(() => {}); };
+$("exp-tudo").onclick = async () => {
+  const linhas = [["Aba", "Nome", "Nº", "Responsável", "Observação", "Nascimento"]];
+  ACERVOS.forEach((a) => E.regs[a.id].forEach((r) => linhas.push([a.titulo, r.nome, r.numero, r.responsavel, r.obs, r.nasc])));
+  try {
+    await baixa("prontuarios-completo-" + hoje() + ".csv", linhas);
+    const t = Date.now(); marcaCopia(t);
+    if (pode("colaborador")) E.db.gravar("meta/backup", {quando: t}).catch(() => {});
+  } catch (e) { /* cancelado */ }
+};
+function marcaCopia(t) { E.copiaEm = t; $("bk").textContent = "Última cópia baixada: " + new Date(t).toLocaleString("pt-BR", {dateStyle: "short", timeStyle: "short"}); lembrete(); }
+// Lembra o editor de baixar a cópia de segurança uma vez por mês.
+function lembrete() {
+  if (E.copiaAuto) $("bk-auto").textContent = "Cópia automática no Drive da escola: a última foi em " + new Date(E.copiaAuto).toLocaleString("pt-BR", {dateStyle: "short", timeStyle: "short"}) + ".";
+  const ultima = Math.max(E.copiaEm || 0, E.copiaAuto || 0), dias = ultima ? (Date.now() - ultima) / 864e5 : Infinity;
+  say($("lembrete"), E.modo === "firebase" && pode("editor") && dias > 30
+    ? (ultima ? "Faz mais de 30 dias que não é feita uma" : "Ainda não foi feita nenhuma") + " cópia de segurança. Em ACESSO → Cópia de segurança, baixe uma e guarde no Drive da escola." : "");
+}
+$("rest-arq").onchange = async () => {
+  const f = $("rest-arq").files[0]; if (!f) return;
+  const buf = await f.arrayBuffer();
+  let txt; try { txt = new TextDecoder("utf-8", {fatal: true}).decode(buf); } catch (e) { txt = new TextDecoder("windows-1252").decode(buf); }
+  const porAba = {};
+  lePlanilha(txt).forEach((c) => { const a = ACERVOS.find((x) => norm(x.titulo) === norm(c[0])); if (a) (porAba[a.id] = porAba[a.id] || []).push(a.responsavel ? c.slice(1, 6) : [c[1], c[2], c[4]]); });
+  if (!Object.keys(porAba).length) { $("rest-arq").value = ""; return say($("rest-msg"), "Este arquivo não é uma cópia completa (falta a coluna Aba).", 1); }
+  if (!pronto(Object.keys(porAba))) { $("rest-arq").value = ""; return say($("rest-msg"), ESPERA, 1); }
+  say($("rest-msg"), "Restaurando…");
+  const partes = [];
+  try {
+    for (const id of Object.keys(porAba)) {
+      const r = prepara(AC[id], porAba[id]);
+      if (r.novos.length) await inserir(AC[id], r.novos);
+      partes.push(AC[id].titulo + ": " + r.novos.length + " de volta" + (r.repetidos ? ", " + r.repetidos + " já estavam" : ""));
+    }
+    registra("restaurou cópia de segurança", "", f.name + ": " + partes.join(" · "));
+    say($("rest-msg"), "Pronto. " + partes.join(" · ") + ".");
+  } catch (e) { say($("rest-msg"), falha(e), 1); }
+  $("rest-arq").value = "";
+};
+
+/* ---------- Impressão ---------- */
+const agoraTxt = () => new Date().toLocaleString("pt-BR", {dateStyle: "short", timeStyle: "short"});
+function cabecalho(titulo, sub) {
+  return '<div class="p-cab"><img src="' + document.querySelector(".logo").src + '" alt=""><div><div class="kick">SECRETARIA · ARQUIVO</div><h1>' + esc(titulo) + '</h1><div class="rs">' + esc(sub) + "</div></div></div>";
+}
+function tabela(a, grupos) {
+  const nasc = a.responsavel && grupos.some((g) => g.some((r) => r.nasc)), loc = faixas(a).length > 0;
+  return "<table><thead><tr><th>" + esc(a.rotulo) + "</th><th>Nome</th>" + (a.responsavel ? "<th>Responsável</th>" : "") + (nasc ? "<th>Nasc.</th>" : "") +
+    '<th>Observação</th>' + (loc ? "<th>Local</th>" : "") + '<th title="Conferido">✓</th></tr></thead>' +
+    grupos.map((g) => "<tbody" + (grupos.length > 1 ? ' class="g"' : "") + ">" + g.map((r) => '<tr><td class="n">' + esc(fmt(r.numero)) + "</td><td>" + esc(r.nome) + "</td>" +
+      (a.responsavel ? "<td>" + esc(r.responsavel) + "</td>" : "") + (nasc ? "<td>" + esc(r.nasc) + "</td>" : "") + "<td>" + esc(r.obs) + "</td>" +
+      (loc ? "<td>" + esc(localDe(a, r)) + "</td>" : "") + '<td class="ok"></td></tr>').join("") + "</tbody>").join("") + "</table>";
+}
+const assinatura = () => '<div class="p-ass"><div>Conferido por</div><div>Data</div></div>';
+function imprime(html) { $("print").innerHTML = html; window.print(); }
+window.addEventListener("afterprint", () => { $("print").innerHTML = ""; });
+function porNumero(regs) {
+  const dig = (r) => /^\d+$/.test(r.numero);
+  return regs.slice().sort((x, y) => dig(x) && dig(y) ? parseInt(x.numero, 10) - parseInt(y.numero, 10)
+    : dig(x) !== dig(y) ? (dig(x) ? -1 : 1) : !x.numero !== !y.numero ? (x.numero ? -1 : 1)
+    : x.numero.localeCompare(y.numero, "pt-BR") || norm(x.nome).localeCompare(norm(y.nome), "pt-BR"));
+}
+function imprimeLista(ordem) {
+  const a = acervo(); if (!E.ok[a.id]) return;
+  const q = norm($("q").value);
+  let regs = q ? filtra(E.regs[a.id], q) : E.regs[a.id];
+  if (!regs.length) return alert("Nada para imprimir.");
+  if (ordem === "num") regs = porNumero(regs);
+  imprime(cabecalho("Prontuários — " + a.titulo, (q ? "Busca: “" + $("q").value.trim() + "” · " : "") + regs.length + " cadastro(s) · " +
+    (ordem === "num" ? "por número" : "em ordem alfabética") + " · impresso em " + agoraTxt()) + tabela(a, [regs]) + assinatura());
+}
+$("pr-nome").onclick = () => imprimeLista("nome");
+$("pr-num").onclick = () => imprimeLista("num");
+$("pr-conf").onclick = () => {
+  const a = acervo(), secoes = (E.secoes || []).filter((s) => s[2].length);
+  if (!secoes.length) return alert("Nenhum problema para conferir nesta aba.");
+  imprime(cabecalho("Conferência — " + a.titulo, "Marque ✓ no que bater com a pasta física e anote a correção na observação · impresso em " + agoraTxt()) +
+    secoes.map((s) => "<h2>" + esc(s[0]) + " (" + s[2].length + ')</h2><p class="p-nota">' + esc(s[1]) + "</p>" +
+      tabela(a, s[0] === "Sem número" ? [s[2].map((g) => g[0])] : s[2])).join("") + assinatura());
+};
+
+/* ---------- Onde ficam as pastas ---------- */
+// "1-2000 Armário A, gaveta 1" (uma faixa por linha; aceita também "1 a 2000" e "1 até 2000").
+function faixas(a) {
+  return String(E.locais[a.id] || "").split(/\r?\n/).map((l) => l.match(/^\s*(\d+)\s*(?:-|–|a|até|ate)\s*(\d+)\s*[:–-]?\s*(.+?)\s*$/i))
+    .filter(Boolean).map((m) => ({de: +m[1], ate: +m[2], local: m[3]}));
+}
+function localDe(a, r) {
+  if (!/^\d+$/.test(r.numero)) return "";
+  const n = +r.numero, f = faixas(a).find((x) => n >= x.de && n <= x.ate);
+  return f ? f.local : "";
+}
+$("loc-aba").onchange = () => { $("loc-txt").value = E.locais[$("loc-aba").value] || ""; say($("loc-msg"), ""); };
+$("loc-salvar").onclick = async () => {
+  const id = $("loc-aba").value, txt = $("loc-txt").value.trim();
+  const ruins = txt.split(/\r?\n/).filter((l) => l.trim() && !/^\s*\d+\s*(?:-|–|a|até|ate)\s*\d+\s*[:–-]?\s*\S/i.test(l));
+  if (ruins.length) return say($("loc-msg"), "Não entendi a linha “" + ruins[0].trim() + "”. Use, por exemplo: 1-2000 Armário A, gaveta 1", 1);
+  try {
+    await E.db.gravar("config/locais", Object.assign({}, E.locais, {[id]: txt}));
+    registra("mudou onde ficam as pastas", id, txt.split(/\r?\n/).length + " faixa(s)");
+    say($("loc-msg"), "Locais salvos.");
+  } catch (e) { say($("loc-msg"), falha(e), 1); }
+};
+
+const dataCurta = (t) => new Date(ms(t)).toLocaleDateString("pt-BR", {day: "2-digit", month: "2-digit", year: "2-digit"});
+
+/* ---------- Lixeira ---------- */
+// O que foi excluído fica pelo menos 30 dias na lixeira; antes disso, só a conta principal apaga de vez.
+const podeApagar = (x) => E.papel === "dono" || E.modo !== "firebase" || Date.now() - ms(x.quando) > 30 * 864e5;
+function ouvirLixeira() {
+  if (E.unsubLixeira) return;
+  E.unsubLixeira = E.db.ouvir("lixeira", (docs) => {
+    E.lixeira = docs.map((d) => Object.assign({id: d.id}, d.data)).filter((x) => !x.restaurado).sort((x, y) => ms(y.quando) - ms(x.quando));
+    $("lix-n").textContent = E.lixeira.reduce((n, x) => n + (x.regs || []).length, 0);
+    $("lix-list").innerHTML = E.lixeira.map((x) => {
+      const a = AC[x.aba] || {titulo: x.aba}, regs = x.regs || [];
+      return '<div class="row"><div class="info"><div class="nm">' + esc(regs.length === 1 ? fmt(regs[0].numero) + " — " + regs[0].nome : regs.length + " cadastros (" + (x.motivo || "") + ")") + "</div>" +
+        '<div class="rs">' + esc(a.titulo) + " · " + esc(x.motivo || "excluído") + " por " + esc(nomeDe(x.por)) + " em " + esc(dataCurta(x.quando)) + "</div>" +
+        (regs.length > 1 ? '<div class="rs">' + esc(regs.slice(0, 5).map((r) => fmt(r.numero) + " " + r.nome).join(", ") + (regs.length > 5 ? "…" : "")) + "</div>" : "") +
+        (podeApagar(x) ? "" : '<div class="rs">Pode ser apagado de vez a partir de ' + esc(dataCurta(ms(x.quando) + 30 * 864e5)) + "</div>") +
+        '</div><div class="act"><button data-lr="' + esc(x.id) + '">restaurar</button>' + (podeApagar(x) ? '<button class="del" data-lx="' + esc(x.id) + '">apagar de vez</button>' : "") + "</div></div>";
+    }).join("") || '<p class="rs">A lixeira está vazia.</p>';
+  }, () => say($("lix-list"), "Não deu para abrir a lixeira.", 1));
+  E.unsub.push(() => { if (E.unsubLixeira) E.unsubLixeira(); E.unsubLixeira = null; });
+}
+$("lix-list").onclick = async (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  const x = (E.lixeira || []).find((l) => l.id === (b.dataset.lr || b.dataset.lx)); if (!x) return;
+  if (!b.dataset.arm) { const t = b.textContent; b.dataset.arm = "1"; b.textContent = "Confirmar?"; setTimeout(() => { b.dataset.arm = ""; b.textContent = t; }, 4000); return; }
+  const a = AC[x.aba]; b.disabled = true;
+  try {
+    if (b.dataset.lr) {
+      if (!pronto([a.id])) { b.disabled = false; return say($("lix-msg"), ESPERA, 1); }
+      const {novos, repetidos} = prepara(a, (x.regs || []).map((r) => a.responsavel ? [r.nome, r.numero, r.responsavel, r.obs, r.nasc] : [r.nome, r.numero, r.obs]));
+      if (novos.length) await inserir(a, novos);
+      await E.db.atualizar("lixeira/" + x.id, {restaurado: true, restauradoPor: quem()});
+      registra("restaurou da lixeira", a.id, novos.map(desc).join("; ").slice(0, 800));
+      say($("lix-msg"), novos.length + " cadastro(s) de volta em " + a.titulo + (repetidos ? " (" + repetidos + " já estavam lá)" : "") + ".");
+    } else {
+      await E.db.apagar("lixeira/" + x.id);
+      registra("apagou da lixeira", x.aba, (x.regs || []).map(desc).join("; ").slice(0, 800));
+    }
+  } catch (err) { say($("lix-msg"), falha(err), 1); b.disabled = false; }
+};
+
+/* ---------- Histórico ---------- */
+function nomeDe(email) {
+  if (email === "teste") return "modo de teste";
+  if (E.donos && E.donos.has(email)) return "Secretaria";
+  const u = (E.acessos || []).find((x) => x.email === email);
+  return u && u.nome ? u.nome : String(email || "").split("@")[0];
+}
+$("hist-card").ontoggle = async () => {
+  if (!$("hist-card").open) return;
+  $("hist-list").innerHTML = '<p class="rs">Carregando…</p>';
+  try {
+    E.hist = await E.db.ultimos("historico", 500);
+    E.donos = new Set();
+    for (const p of new Set(E.hist.map((h) => h.por))) if (await ehDono(p)) E.donos.add(p);
+    renderHist();
+  }
+  catch (e) { say($("hist-list"), falha(e), 1); }
+};
+function renderHist() {
+  const q = norm($("hist-q").value), t = q ? q.split(" ") : [];
+  const lista = (E.hist || []).filter((h) => { const x = norm(h.acao + " " + h.texto + " " + h.por + " " + nomeDe(h.por) + " " + ((AC[h.aba] || {}).titulo || "")); return t.every((p) => x.includes(p)); });
+  $("hist-list").innerHTML = lista.slice(0, 300).map((h) => '<div class="hist"><b>' + esc(nomeDe(h.por)) + "</b> " + esc(h.acao) +
+    (h.aba && AC[h.aba] ? " em " + esc(AC[h.aba].titulo) : "") + (h.texto ? ": " + esc(h.texto) : "") +
+    '<div class="rs">' + esc(new Date(ms(h.quando) || Date.now()).toLocaleString("pt-BR", {dateStyle: "short", timeStyle: "short"})) + "</div></div>").join("") ||
+    '<p class="rs">' + (q ? "Nada encontrado." : "Nada registrado ainda.") + "</p>";
+}
+$("hist-q").oninput = renderHist;
+
+/* ---------- Acessos (Firebase) ---------- */
+function ouvirAcessos() {
+  if (E.unsubAcessos) return;
+  $("dono-info").textContent = CONF.donoHash ? "A conta principal da secretaria pode tudo e não aparece nesta lista." : "";
+  E.unsubAcessos = E.fb.ouvir("acessos", (docs) => {
+    E.acessos = docs.map((d) => Object.assign({email: d.id}, d.data)).sort((x, y) => norm(x.nome).localeCompare(norm(y.nome)));
+    $("u-list").innerHTML = E.acessos.map((u) =>
+      '<div class="row"><div class="info"><div class="nm">' + esc(u.nome || u.email) + '</div><div class="rs">' + esc(u.email) + "</div></div>" +
+      '<div class="act"><select data-p="' + esc(u.email) + '" aria-label="Nível de ' + esc(u.nome) + '">' +
+      ["consulta", "colaborador", "editor"].map((p) => '<option value="' + p + '"' + (p === u.papel ? " selected" : "") + ">" + PAPEL[p] + "</option>").join("") +
+      '</select><button class="del" data-x="' + esc(u.email) + '">remover</button></div></div>').join("") || '<p class="rs">Ninguém além da conta principal ainda.</p>';
+  }, () => say($("u-list"), "Não deu para carregar os acessos.", 1));
+  E.unsub.push(() => { if (E.unsubAcessos) E.unsubAcessos(); E.unsubAcessos = null; });
+}
+$("u-list").onchange = async (e) => {
+  const s = e.target.closest("select[data-p]"); if (!s) return;
+  const u = E.acessos.find((x) => x.email === s.dataset.p);
+  try {
+    await E.fb.gravar("acessos/" + u.email, {nome: u.nome || "", papel: s.value, criadoEm: u.criadoEm || Date.now(), criadoPor: u.criadoPor || "", alteradoEm: Date.now(), alteradoPor: meuEmail()});
+    registra("mudou nível de acesso", "", u.email + ": " + PAPEL[u.papel] + " → " + PAPEL[s.value]);
+  }
+  catch (err) { alert(falha(err)); }
+};
+$("u-list").onclick = async (e) => {
+  const b = e.target.closest("button[data-x]"); if (!b) return;
+  if (!b.dataset.arm) { b.dataset.arm = "1"; b.textContent = "Confirmar?"; setTimeout(() => { b.dataset.arm = ""; b.textContent = "remover"; }, 4000); return; }
+  try { await E.fb.apagar("acessos/" + b.dataset.x); registra("removeu acesso", "", b.dataset.x); } catch (err) { alert(falha(err)); }
+};
+$("f-user").onsubmit = async (e) => {
+  e.preventDefault();
+  const nome = limpa($("u-nome").value), email = $("u-email").value.trim().toLowerCase(), senha = $("u-senha").value, papel = $("u-papel").value;
+  if (nome.length < 2) return say($("u-msg"), "Digite o nome da pessoa.", 1);
+  if (!/^[^@\s/]+@[^@\s/]+\.[^@\s/]+$/.test(email)) return say($("u-msg"), "Digite um e-mail válido.", 1);
+  if (senha.length < 6) return say($("u-msg"), "A senha inicial precisa ter pelo menos 6 caracteres.", 1);
+  const bt = e.target.querySelector(".big"); bt.disabled = true;
+  let novo;
+  try { novo = await E.fb.criarConta(email, senha); }
+  catch (err) { bt.disabled = false; return say($("u-msg"), err && err.code === "auth/invalid-email" ? "Esse e-mail não é válido." : err && err.code === "auth/weak-password" ? "Senha fraca demais. Use pelo menos 6 caracteres." : "Não deu para criar o login. Confira a internet.", 1); }
+  try {
+    await E.fb.gravar("acessos/" + email, {nome, papel, criadoEm: Date.now(), criadoPor: meuEmail()});
+    registra("deu acesso", "", nome + " (" + email + ") como " + PAPEL[papel]);
+    const pn = nome.split(" ")[0];
+    say($("u-msg"), novo ? "Acesso criado para " + pn + ". Passe o e-mail e a senha para a pessoa. No primeiro acesso, ela confirma o e-mail pelo link que chegou na caixa de entrada."
+      : "Esse e-mail já tinha login. Para garantir que é mesmo a " + pn + ", mandamos para ele um link de criar senha: ela cria a senha por lá e entra.");
+    ["u-nome", "u-email", "u-senha"].forEach((i) => { $(i).value = ""; });
+  } catch (err) { say($("u-msg"), falha(err), 1); }
+  bt.disabled = false;
+};
+
+/* ---------- Instalar e atualizar (site da escola) ---------- */
+$("instalar").onclick = async () => { if (!E.instalar) return; E.instalar.prompt(); await E.instalar.userChoice.catch(() => {}); E.instalar = null; $("instalar").classList.add("hide"); };
+function pwa() {
+  window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); E.instalar = e; $("instalar").classList.remove("hide"); });
+  if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+  const tinha = !!navigator.serviceWorker.controller;
+  // Versão nova publicada: recarrega sozinho, menos no meio de um cadastro.
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (!tinha) return;
+    const ocupado = () => E.ed || ($("nome").value && !$("s-form").classList.contains("hide")) || $("paste").value;
+    const tenta = () => { if (ocupado()) return setTimeout(tenta, 30000); location.reload(); };
+    tenta();
+  });
+  navigator.serviceWorker.register("sw.js", {updateViaCache: "none"}).then((reg) => {
+    const conferir = () => reg.update().catch(() => {});
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") conferir(); });
+    setInterval(conferir, 20 * 60000);
+  }).catch(() => {});
+}
+
+/* ---------- Início ---------- */
+async function iniciar() {
+  pwa();
+  if (CONF.apiKey) {
+    E.modo = "firebase";
+    try { E.fb = await firebaseDB(CONF); }
+    catch (e) { console.warn(e); say($("status"), "Não deu para abrir o app. Confira a internet e recarregue a página.", 1); return; }
+    E.db = E.fb;
+    try { $("l-email").value = localStorage.getItem("prontuarios:email") || ""; } catch (e) { /* ok */ }
+    $("l-primeiro").classList.toggle("hide", !CONF.donoHash);
+    E.fb.onAuth((u) => {
+      E.user = u;
+      if (!u) { sairDados(); E.locais = {}; ACERVOS.forEach((a) => { E.lotes[a.id] = {}; E.regs[a.id] = []; E.ok[a.id] = false; E.sync[a.id] = false; }); view("login"); return; }
+      entrou();
+    });
+    return;
+  }
+  E.modo = "local"; E.db = localDB(); E.papel = "editor"; abreApp();
+}
+iniciar();
+})();
+</script>
+</body>
+</html>
