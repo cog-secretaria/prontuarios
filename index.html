@@ -261,7 +261,7 @@ details>summary.ghost::-webkit-details-marker{display:none}
 "use strict";
 const $ = (i) => document.getElementById(i);
 // Versão do app e das regras do Firebase (firestore.rules, bloco "versao"). Troque juntas quando as regras mudarem.
-const VERSAO = "9", REGRAS = "regras-5";
+const VERSAO = "10", REGRAS = "regras-5";
 const CONF = window.PRONTUARIOS_FIREBASE || {};
 const PAPEL = {consulta: "Consulta", colaborador: "Colaborador", editor: "Editor", dono: "Secretaria"};
 const NIVEL = {consulta: 0, colaborador: 1, editor: 2, dono: 2};
@@ -469,29 +469,32 @@ async function removerIdenticos(a) {
   return total;
 }
 
-// Nome → aba onde ele já está cadastrado (fora da aba a). O nome de uma aba no lugar do nome da pessoa também conta:
-// é o que entra quando a planilha completa, com todas as abas, é importada numa aba só.
-function nomesDeOutrasAbas(a) {
+// Cadastros das outras abas (fora da aba a), para achar o que entrou na aba errada. Só o nome não basta:
+// há pastas avulsas com o mesmo nome de um aluno ou professor. Conta o mesmo nome com o mesmo número;
+// sem número, o mesmo nome de um cadastro sem número; e o nome de uma aba no lugar do nome da pessoa
+// (é o que entra quando a planilha completa, com todas as abas, é importada numa aba só).
+function outrasAbas(a) {
   const m = new Map();
-  ACERVOS.forEach((x) => m.set(norm(x.titulo), x.titulo));
-  ACERVOS.forEach((x) => { if (x.id !== a.id) E.regs[x.id].forEach((r) => { const k = norm(r.nome); if (k && !m.has(k)) m.set(k, x.titulo); }); });
+  ACERVOS.forEach((x) => m.set("s|" + norm(x.titulo), x.titulo));
+  ACERVOS.forEach((x) => { if (x.id !== a.id) E.regs[x.id].forEach((r) => { const k = (r.numero ? "n|" + r.numero + "|" : "s|") + norm(r.nome); if (!m.has(k)) m.set(k, x.titulo); }); });
   return m;
 }
+const abaDe = (m, r) => m.get((r.numero ? "n|" + r.numero + "|" : "s|") + norm(r.nome));
 // Pastas Avulsas: cadastros que são de outra aba (planilha de outra aba importada aqui por engano).
 function deOutraAba(a) {
   if (a.id !== "avulsas" || !ACERVOS.every((x) => E.ok[x.id])) return [];
-  const m = nomesDeOutrasAbas(a);
-  return E.regs[a.id].filter((r) => m.has(norm(r.nome)));
+  const m = outrasAbas(a);
+  return E.regs[a.id].filter((r) => abaDe(m, r));
 }
 // Tira esses cadastros da aba. Cada lote vai para a lixeira separado, para caber no limite de tamanho do Firebase.
 async function tirarDeOutraAba(a) {
-  const m = nomesDeOutrasAbas(a);
+  const m = outrasAbas(a);
   let total = 0;
   for (const id of Object.keys(E.lotes[a.id]).sort()) {
     let sai = [];
     await E.db.mutar(a.col, id, (arr) => {
       sai = [];
-      return arr.filter((x) => { const r = a.reg(x); if (m.has(norm(r.nome))) { sai.push(campoReg(r)); return false; } return true; });
+      return arr.filter((x) => { const r = a.reg(x); if (abaDe(m, r)) { sai.push(campoReg(r)); return false; } return true; });
     });
     if (sai.length) { await E.db.adicionar("lixeira", {aba: a.id, regs: sai, motivo: "era de outra aba", por: quem(), quando: E.db.agora()}); total += sai.length; }
   }
@@ -499,16 +502,24 @@ async function tirarDeOutraAba(a) {
   return total;
 }
 
-// Uma vez só, quando a conta principal abre o app: as Pastas Avulsas receberam a planilha das outras abas.
-// Tira esses cadastros sozinho (vão para a lixeira) e marca em config/limpeza-avulsas para não repetir.
+// Uma vez só, quando a conta principal abre o app: as Pastas Avulsas receberam a planilha de ALUNOS.
+// Tira esses cadastros sozinho (vão para a lixeira) e devolve as pastas avulsas que a versão 9 tirou só
+// por terem o nome igual ao de alguém de outra aba. Marca as duas limpezas para nenhum aparelho repetir.
 async function limpaAvulsas() {
   if (E.modo !== "firebase" || E.papel !== "dono" || E.limpando || !pronto(ACERVOS.map((x) => x.id))) return;
   E.limpando = true;
   try {
-    if (await E.db.ler("config/limpeza-avulsas")) return;
+    if (await E.db.ler("config/limpeza-avulsas-2")) return;
     const a = AC.avulsas, n = deOutraAba(a).length ? await tirarDeOutraAba(a) : 0;
+    const m = outrasAbas(a), volta = [];
+    (await E.db.ultimos("lixeira", 500)).filter((x) => x.aba === a.id && x.motivo === "era de outra aba" && !x.restaurado)
+      .forEach((x) => (x.regs || []).forEach((r) => { if (!abaDe(m, r)) volta.push([r.nome, r.numero, r.obs]); }));
+    const {novos} = prepara(a, volta);
+    if (novos.length) { await inserir(a, novos); registra("devolveu pastas avulsas", a.id, novos.length + " pasta(s) que tinham saído por engano: " + novos.map((r) => r.nome).join(", ")); }
     await E.db.gravar("config/limpeza-avulsas", {quando: Date.now(), tirados: n});
-    if (n) say($("aviso"), "Arrumamos as Pastas Avulsas: " + n + " cadastro(s) que eram de outras abas saíram de lá. Estão na lixeira, em ACESSO.");
+    await E.db.gravar("config/limpeza-avulsas-2", {quando: Date.now(), tirados: n, devolvidos: novos.length});
+    if (n || novos.length) say($("aviso"), "Arrumamos as Pastas Avulsas" + (n ? ": " + n + " cadastro(s) que eram de outras abas saíram de lá e estão na lixeira, em ACESSO" : "") +
+      (novos.length ? (n ? ", e " : ": ") + novos.length + " pasta(s) avulsa(s) voltaram para o lugar" : "") + ".");
   } catch (e) { console.warn(e); E.limpando = false; }
 }
 
@@ -807,7 +818,7 @@ function renderConf() {
     ["Sem número", "Cadastros sem número de pasta. Localize a pasta e preencha o número.", c.semNumero.map((r) => [r])]
   ];
   const outra = deOutraAba(a);
-  if (outra.length) secoes.push(["São de outra aba", "Estes nomes já estão cadastrados em outra aba. Provavelmente entraram aqui com a planilha errada.", outra.map((r) => [r])]);
+  if (outra.length) secoes.push(["São de outra aba", "Estes cadastros, com o mesmo nome e o mesmo número, já estão em outra aba. Provavelmente entraram aqui com a planilha errada.", outra.map((r) => [r])]);
   E.conf = {}; E.secoes = secoes;
   secoes.forEach((s) => s[2].forEach((g) => g.forEach((r) => { E.conf[r.id] = r; })));
   $("c-resumo").innerHTML = secoes.map((s) =>
@@ -882,8 +893,8 @@ $("doImp").onclick = async () => {
   const {novos, repetidos, conflitos, semNum} = prepara(a, lePlanilha(txt));
   if (!novos.length) return say($("imsg"), "Nada novo para importar" + (repetidos ? ": as " + repetidos + " linha(s) já estão cadastradas." : "."), 1);
   // Planilha de outra aba: pede para tocar de novo antes de gravar.
-  const m = nomesDeOutrasAbas(a), conta = {};
-  novos.forEach((r) => { const t = m.get(norm(r.nome)); if (t) conta[t] = (conta[t] || 0) + 1; });
+  const m = outrasAbas(a), conta = {};
+  novos.forEach((r) => { const t = abaDe(m, r); if (t) conta[t] = (conta[t] || 0) + 1; });
   const nOutra = Object.values(conta).reduce((x, y) => x + y, 0), chave = a.id + "|" + txt.length;
   if (novos.length >= 10 && nOutra >= novos.length * 0.3 && $("doImp").dataset.arm !== chave) {
     $("doImp").dataset.arm = chave;
