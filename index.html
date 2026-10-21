@@ -261,7 +261,7 @@ details>summary.ghost::-webkit-details-marker{display:none}
 "use strict";
 const $ = (i) => document.getElementById(i);
 // Versão do app e das regras do Firebase (firestore.rules, bloco "versao"). Troque juntas quando as regras mudarem.
-const VERSAO = "7", REGRAS = "regras-5";
+const VERSAO = "8", REGRAS = "regras-5";
 const CONF = window.PRONTUARIOS_FIREBASE || {};
 const PAPEL = {consulta: "Consulta", colaborador: "Colaborador", editor: "Editor", dono: "Secretaria"};
 const NIVEL = {consulta: 0, colaborador: 1, editor: 2, dono: 2};
@@ -465,6 +465,36 @@ async function removerIdenticos(a) {
     await E.db.adicionar("lixeira", {aba: a.id, regs: tirados, motivo: "cópias idênticas", por: quem(), quando: E.db.agora()}).catch((e) => console.warn(e));
     registra("removeu cópias idênticas", a.id, tirados.length + " cadastro(s) (foram para a lixeira)");
   }
+  return total;
+}
+
+// Nome → aba onde ele já está cadastrado (fora da aba a). O nome de uma aba no lugar do nome da pessoa também conta:
+// é o que entra quando a planilha completa, com todas as abas, é importada numa aba só.
+function nomesDeOutrasAbas(a) {
+  const m = new Map();
+  ACERVOS.forEach((x) => m.set(norm(x.titulo), x.titulo));
+  ACERVOS.forEach((x) => { if (x.id !== a.id) E.regs[x.id].forEach((r) => { const k = norm(r.nome); if (k && !m.has(k)) m.set(k, x.titulo); }); });
+  return m;
+}
+// Pastas Avulsas: cadastros que são de outra aba (planilha de outra aba importada aqui por engano).
+function deOutraAba(a) {
+  if (a.id !== "avulsas" || !ACERVOS.every((x) => E.ok[x.id])) return [];
+  const m = nomesDeOutrasAbas(a);
+  return E.regs[a.id].filter((r) => m.has(norm(r.nome)));
+}
+// Tira esses cadastros da aba. Cada lote vai para a lixeira separado, para caber no limite de tamanho do Firebase.
+async function tirarDeOutraAba(a) {
+  const m = nomesDeOutrasAbas(a);
+  let total = 0;
+  for (const id of Object.keys(E.lotes[a.id]).sort()) {
+    let sai = [];
+    await E.db.mutar(a.col, id, (arr) => {
+      sai = [];
+      return arr.filter((x) => { const r = a.reg(x); if (m.has(norm(r.nome))) { sai.push(campoReg(r)); return false; } return true; });
+    });
+    if (sai.length) { await E.db.adicionar("lixeira", {aba: a.id, regs: sai, motivo: "era de outra aba", por: quem(), quando: E.db.agora()}); total += sai.length; }
+  }
+  if (total) registra("tirou cadastros de outras abas", a.id, total + " cadastro(s) (foram para a lixeira)");
   return total;
 }
 
@@ -762,16 +792,22 @@ function renderConf() {
     ["Mesmo nome com números diferentes", a.responsavel ? "Se for outra pessoa (homônimo), escreva HOMÔNIMO na observação dos dois, como já é feito nos outros. Se for a mesma pessoa, fica a pasta certa e o outro cadastro é corrigido ou excluído." : "Pode ser outra pessoa com o mesmo nome. Use a observação para diferenciar.", c.nomeVarios],
     ["Sem número", "Cadastros sem número de pasta. Localize a pasta e preencha o número.", c.semNumero.map((r) => [r])]
   ];
+  const outra = deOutraAba(a);
+  if (outra.length) secoes.push(["São de outra aba", "Estes nomes já estão cadastrados em outra aba. Provavelmente entraram aqui com a planilha errada.", outra.map((r) => [r])]);
   E.conf = {}; E.secoes = secoes;
   secoes.forEach((s) => s[2].forEach((g) => g.forEach((r) => { E.conf[r.id] = r; })));
   $("c-resumo").innerHTML = secoes.map((s) =>
     '<div class="lv"><b>' + esc(s[0]) + '</b><span class="badge' + (s[2].length ? "" : " ok") + '">' + (s[2].length || "nenhum") + "</span></div>"
   ).join("") + (pode("editor") && c.identicos ? '<button class="ghost mt" id="rm-ident">Remover ' + c.identicos + " cópia(s) idêntica(s)</button>" +
-    '<p class="rs">Remove só as cópias exatas (nome, número, responsável e observação iguais) e mantém um cadastro de cada.</p>' : "");
+    '<p class="rs">Remove só as cópias exatas (nome, número, responsável e observação iguais) e mantém um cadastro de cada.</p>' : "") +
+    (outra.length ? (E.papel === "dono" || E.modo !== "firebase"
+      ? '<button class="ghost mt" id="rm-outra">Tirar daqui ' + outra.length + " cadastro(s) de outras abas</button>" +
+        '<p class="rs">Saem só desta aba e vão para a lixeira (dá para restaurar). As outras abas não mudam.</p>'
+      : '<p class="rs mt">Para tirar de uma vez os ' + outra.length + " cadastro(s) de outras abas, entre com a conta principal da secretaria.</p>") : "");
   const abertas = {}; $("c-grupos").querySelectorAll("details").forEach((d) => { abertas[d.dataset.k] = d.open; });
   let primeira = true;
   $("c-grupos").innerHTML = secoes.filter((s) => s[2].length).map((s) => {
-    const sozinho = s === secoes[3], lim = sozinho ? 500 : 300, aberta = s[0] in abertas ? abertas[s[0]] : primeira;
+    const sozinho = s[2].every((g) => g.length === 1), lim = sozinho ? 500 : 300, aberta = s[0] in abertas ? abertas[s[0]] : primeira;
     const corpo = sozinho ? '<div class="grp">' + s[2].slice(0, lim).map((g) => linha(g[0])).join("") + "</div>"
       : s[2].slice(0, lim).map((g) => '<div class="grp">' + g.map((r) => linha(r)).join("") + "</div>").join("");
     primeira = false;
@@ -779,6 +815,14 @@ function renderConf() {
       '<p class="rs">' + esc(s[1]) + "</p>" + corpo +
       (s[2].length > lim ? '<p class="rs">Mostrando ' + lim + " de " + s[2].length + ". Corrija estes e os demais aparecem.</p>" : "") + "</details>";
   }).join("") || '<div class="msg">Nenhum problema encontrado nesta aba.</div>';
+  const ro = $("rm-outra");
+  if (ro) ro.onclick = async () => {
+    if (!ro.dataset.arm) { ro.dataset.arm = "1"; ro.textContent = "Confirmar: tirar " + outra.length + " cadastro(s) de " + a.titulo + "?"; return; }
+    if (!pronto(ACERVOS.map((x) => x.id))) return say($("c-msg"), ESPERA, 1);
+    ro.disabled = true; say($("c-msg"), "Tirando…");
+    try { say($("c-msg"), (await tirarDeOutraAba(a)) + " cadastro(s) tirado(s) de " + a.titulo + ". Estão na lixeira, em ACESSO."); }
+    catch (e) { say($("c-msg"), falha(e), 1); ro.disabled = false; }
+  };
   const rm = $("rm-ident");
   if (rm) rm.onclick = async () => {
     if (!rm.dataset.arm) { rm.dataset.arm = "1"; rm.textContent = "Confirmar remoção?"; return; }
@@ -823,6 +867,17 @@ $("doImp").onclick = async () => {
   if (!pronto([a.id])) return say($("imsg"), ESPERA, 1);
   const {novos, repetidos, conflitos, semNum} = prepara(a, lePlanilha(txt));
   if (!novos.length) return say($("imsg"), "Nada novo para importar" + (repetidos ? ": as " + repetidos + " linha(s) já estão cadastradas." : "."), 1);
+  // Planilha de outra aba: pede para tocar de novo antes de gravar.
+  const m = nomesDeOutrasAbas(a), conta = {};
+  novos.forEach((r) => { const t = m.get(norm(r.nome)); if (t) conta[t] = (conta[t] || 0) + 1; });
+  const nOutra = Object.values(conta).reduce((x, y) => x + y, 0), chave = a.id + "|" + txt.length;
+  if (novos.length >= 10 && nOutra >= novos.length * 0.3 && $("doImp").dataset.arm !== chave) {
+    $("doImp").dataset.arm = chave;
+    const onde = Object.keys(conta).sort((x, y) => conta[y] - conta[x]).join(", ");
+    return say($("imsg"), "Atenção: " + nOutra + " das " + novos.length + " linhas já estão cadastradas em " + onde + ". Parece a planilha de outra aba. " +
+      "Confira se escolheu o arquivo certo para " + a.titulo + ". Para importar mesmo assim, toque em Importar de novo.", 1);
+  }
+  $("doImp").dataset.arm = "";
   $("doImp").disabled = true; say($("imsg"), "Importando " + novos.length + " cadastro(s) em " + a.titulo + "…");
   try {
     await inserir(a, novos);
