@@ -261,7 +261,7 @@ details>summary.ghost::-webkit-details-marker{display:none}
 "use strict";
 const $ = (i) => document.getElementById(i);
 // Versão do app e das regras do Firebase (firestore.rules, bloco "versao"). Troque juntas quando as regras mudarem.
-const VERSAO = "8", REGRAS = "regras-5";
+const VERSAO = "9", REGRAS = "regras-5";
 const CONF = window.PRONTUARIOS_FIREBASE || {};
 const PAPEL = {consulta: "Consulta", colaborador: "Colaborador", editor: "Editor", dono: "Secretaria"};
 const NIVEL = {consulta: 0, colaborador: 1, editor: 2, dono: 2};
@@ -416,6 +416,7 @@ function ouvirTudo() {
     E.lotes[a.id] = {}; docs.forEach((d) => { E.lotes[a.id][d.id] = (d.data && d.data.a) || []; });
     monta(a); E.ok[a.id] = true; E.sync[a.id] = !cache;
     if (a.id === E.ac) { render(); if (E.sub === "conf") renderConf(); }
+    limpaAvulsas();
   }, (e) => { console.warn(e); say($("aviso"), "Não deu para carregar os dados. Confira a internet e o seu acesso.", 1); })));
   E.db.ler("meta/backup").then((d) => { E.copiaEm = d && d.quando || 0; if (E.copiaEm) marcaCopia(E.copiaEm); lembrete(); }).catch(() => {});
   E.db.ler("meta/copia-auto").then((d) => { E.copiaAuto = d && d.quando || 0; lembrete(); }).catch(() => {});
@@ -496,6 +497,19 @@ async function tirarDeOutraAba(a) {
   }
   if (total) registra("tirou cadastros de outras abas", a.id, total + " cadastro(s) (foram para a lixeira)");
   return total;
+}
+
+// Uma vez só, quando a conta principal abre o app: as Pastas Avulsas receberam a planilha das outras abas.
+// Tira esses cadastros sozinho (vão para a lixeira) e marca em config/limpeza-avulsas para não repetir.
+async function limpaAvulsas() {
+  if (E.modo !== "firebase" || E.papel !== "dono" || E.limpando || !pronto(ACERVOS.map((x) => x.id))) return;
+  E.limpando = true;
+  try {
+    if (await E.db.ler("config/limpeza-avulsas")) return;
+    const a = AC.avulsas, n = deOutraAba(a).length ? await tirarDeOutraAba(a) : 0;
+    await E.db.gravar("config/limpeza-avulsas", {quando: Date.now(), tirados: n});
+    if (n) say($("aviso"), "Arrumamos as Pastas Avulsas: " + n + " cadastro(s) que eram de outras abas saíram de lá. Estão na lixeira, em ACESSO.");
+  } catch (e) { console.warn(e); E.limpando = false; }
 }
 
 /* ---------- Histórico e lixeira ---------- */
